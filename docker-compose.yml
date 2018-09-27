@@ -1,0 +1,8 @@
+version: "3"
+services:
+        virgin1bot:
+                container_name: virgin1bot
+                build: .
+                command: nodemon --exec "python -v" /app/virgin1bot.py
+                volumes:
+                        - .:/app
