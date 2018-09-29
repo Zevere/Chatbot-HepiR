@@ -28,6 +28,9 @@ deploy:
     on:
       branch: master
 
+env:
+  # DEPLOY_SETTINGS_JSON='{"Staging":[ /* ... */ ]}'
+  - secure: "ptZbi6YI2mbtr7kZHfdKEFV6Lc55ePO7pXo8+Q4xZ38gsibD49HFuNXL4b8KyGbJ1boO1sty8j1g/OMRYd+N1Z4CdEHZFO8T2rUOaf9SJ6UdKMJvHbHGkrGPatkSIEO0qtdSdnfg2f4KMoainJRMTDnAqLx4hY9flpHyPfoT18vNsolrDPUOnnRhbi1EjpKE2BUBJt2EWA+wRoqCfghqg3iUdWvggmi95bsmdu6FMvgCT9SO9arx4z8Zqfd10/fFqkEsruE8cG7TNcrjSzE3fGUfHvLm9yBZ/AuPgolezjOJKLl6HoDPQwnX9wuZjsPt0M6wS/X+/kFwZeOCCf/+p6SzV6YWtxxCT1+dHoSqUy8fi73sUSZa0n7EqF2e66TZt3IXanifCS3bfxyBVxvP7bAT7GsCsp+UEr1VjtG9mREUOJ+kZFg35wPI83+DckFkBWCCvOezWpIn/T+7OZry2neVXV/gUXxU07XVgjoeysbx1x+7CjnTYL3f0mkQiFDFZEYSGdSMtuD9+utEsf6v2eL9q0owFdfinYKSFTi0jiMLEoFyfpk5Qm5fi3VA2V1MY/Xe5Us5EfY5EL5WZSiIOUUXQzLcu6p5a9xwmGT8YdA/LgXRxx2I9k01PcLWbdkIHcLOMh5Z2TarJKAanfUEoz8o0KsuYFQECbUCPwBt4Xo="
 
 # Disable "Build pushed pull requests"
 
