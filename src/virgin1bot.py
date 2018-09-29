@@ -1,10 +1,12 @@
 import requests
 import time
 import datetime
+import json
+import os
 
 class Virgin1BotHandler:
     
-    VERSION="1.3.2"
+    VERSION="1.4.2"
     UNDERSTANDABLE_LANGUAGE=('hello','bonjour','hi','greetings','sup')
 
     def __init__(self, token):
@@ -38,8 +40,11 @@ class Virgin1BotHandler:
 
 # --- END CLASS DEF ---
 def main():
+    # read config from env file
+    CONFIGS=os.environ['CONFIGS']
+
     new_offset=None
-    token=$VIRGIN1_TOKEN
+    token=json.loads(CONFIGS)['token']
     virgin1bot=Virgin1BotHandler(token)
 
     print("Starting bot now")
