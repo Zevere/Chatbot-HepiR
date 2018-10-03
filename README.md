@@ -22,3 +22,6 @@ git push heroku master
 heroku ps:scale (web|worker)=(0|1)
 heroku logs
 ```
+
+## credits
+https://github.com/python-telegram-bot/python-telegram-bot
