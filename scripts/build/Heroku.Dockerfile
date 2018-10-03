@@ -5,4 +5,4 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-CMD ["python", "virgin1bot.py"]
+CMD python virgin1bot.py
