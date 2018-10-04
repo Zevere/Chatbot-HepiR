@@ -22,4 +22,4 @@ COPY . $APP_HOME
 #EXPOSE 80
 
 # Define our command to be run when launching the container
-CMD ["python", "virgin1bot.py"]
+CMD ["python", "hepirbot.py"]

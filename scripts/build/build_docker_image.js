@@ -6,7 +6,7 @@ const root = `${__dirname}/../..`
 
 
 module.exports.build_image = function () {
-    const image_name = 'chatbot-kev:latest'
+    const image_name = 'chatbot-hepir:latest'
     console.info(`building Docker Image "${image_name}"`)
 
     console.debug('copying Dockerfile')
@@ -16,5 +16,5 @@ module.exports.build_image = function () {
     $.cp('-R', `${root}/src/*`, `${root}/dist/app`)
 
     console.debug('building docker image')
-    $.exec(`docker build -t ${image_name} ${root}/dist/`)
+    $.exec(`docker build --rm -t ${image_name} ${root}/dist/`)
 }
