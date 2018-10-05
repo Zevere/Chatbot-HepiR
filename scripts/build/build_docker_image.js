@@ -16,5 +16,5 @@ module.exports.build_image = function () {
     $.cp('-R', `${root}/src/*`, `${root}/dist/app`)
 
     console.debug('building docker image')
-    $.exec(`docker build --rm -t ${image_name} ${root}/dist/`)
+    $.exec(`docker build -t ${image_name} ${root}/dist/`)
 }
