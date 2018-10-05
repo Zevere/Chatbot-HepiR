@@ -8,7 +8,7 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 
 # Install our requirements
-ADD requirements.txt $APP_HOME/requirements.txt
+ADD src/requirements.txt $APP_HOME/requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy our code from the current folder to /app inside the container
