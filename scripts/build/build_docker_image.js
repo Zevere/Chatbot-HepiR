@@ -6,7 +6,7 @@ const root = `${__dirname}/../..`
 
 
 module.exports.build_image = function () {
-    const image_name = 'chatbot-kev:latest'
+    const image_name = 'chatbot-hepir:latest'
     console.info(`building Docker Image "${image_name}"`)
 
     console.debug('copying Dockerfile')
