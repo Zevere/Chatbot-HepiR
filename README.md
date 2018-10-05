@@ -1,5 +1,7 @@
 # Zevere Bot for Telegram
 
+[![Docker Badge]](https://hub.docker.com/r/zevere/chatbot-hepir)
+
 First time developing a telegram bot
 
 ## to build image
@@ -29,3 +31,5 @@ heroku logs
 
 ## credits
 https://github.com/python-telegram-bot/python-telegram-bot
+
+[Docker Badge]: https://img.shields.io/docker/pulls/zevere/chatbot-hepir.svg
