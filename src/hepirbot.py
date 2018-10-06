@@ -92,11 +92,9 @@ def print_transaction(update,cmd,is_command=True):
 
 def main():
     # read config from env file
-    #CONFIGS=os.environ['CONFIGS']
-    #bot_token=json.loads(CONFIGS)['bot_token']
-    #openweather_token=json.loads(CONFIGS)['openweather_token']
-    bot_token='651982727:AAGZHYc-nEOFDZefOXqIgoogZFZKNvJs6TY'
-    openweather_token='29692976ce1e17a3e223992fd2f5b195'
+    CONFIGS=os.environ['CONFIGS']
+    bot_token=json.loads(CONFIGS)['bot_token']
+    openweather_token=json.loads(CONFIGS)['openweather_token']
     updater=Updater(token=bot_token)
     dispatcher=updater.dispatcher
 

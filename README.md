@@ -7,16 +7,13 @@ First time developing a telegram bot
 ## to build image
 
 ```sh
-cd scripts
-npm i
-cd ..
-node scripts/build
+cd scripts && npm i && cd .. && node scripts/build
 ```
 
 ## to run the image to start up the bot
 
 ```sh
-docker run --env CONFIGS='{"token":"TOKEN"}' zevere/chatbot-kev
+docker run -it --env CONFIGS='{"bot_token":"BOT_TOKEN GOES HERE","openweather_token":"OPENWEATHER TOKEN GOES HERE"}' chatbot-hepir
 ```
 
 ## heroku cli commands used
