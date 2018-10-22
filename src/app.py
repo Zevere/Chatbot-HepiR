@@ -6,7 +6,20 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start', 'go'])
 def start_handler(message):
-    bot.send_message(message.chat.id, "Hello, when I grow up, I'll parse the headers with the Hub")
+    chat_id = message.chat.id
+    text = message.text
+    msg = bot.send_message(chat_id, 'How old are you?')
+    bot.register_next_step_handler(msg, askAge)
+
+
+def askAge(message):
+    chat_id = message.chat.id
+    text = message.text
+    if not text.isdigit():
+        msg = bot.send_message(chat_id, 'Age must be a number, enter again.')
+        bot.register_next_step_handler(msg, askAge)
+        return
+    bot.send_message(chat_id, 'Thank you, I remembered that you are {} y/o.'.format(text))
 
 
 @bot.message_handler(content_types=['text'])
