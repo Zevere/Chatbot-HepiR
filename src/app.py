@@ -1,25 +1,86 @@
 import telebot
+import bs4
+from src.Task import Task
+import src.Parser as parser
 
+# main variables
 TOKEN = "752142027:AAGCp47hpBa3LYkBgEXMUlftOABpndyqwOM"
 bot = telebot.TeleBot(TOKEN)
+task = Task()
 
 
+# handlers
 @bot.message_handler(commands=['start', 'go'])
 def start_handler(message):
+    if not task.isRunning:
+        chat_id = message.chat.id
+        msg = bot.send_message(chat_id, 'Where to parse?')
+        bot.register_next_step_handler(msg, askSource)
+        task.isRunning = True
+
+
+def askSource(message):
     chat_id = message.chat.id
-    text = message.text
-    msg = bot.send_message(chat_id, 'How old are you?')
-    bot.register_next_step_handler(msg, askAge)
+    text = message.text.lower()
+    if text in task.names[0]:
+        task.mySource = 'top'
+        msg = bot.send_message(chat_id, 'For what time period?')
+        bot.register_next_step_handler(msg, askAge)
+    elif text in task.names[1]:
+        task.mySource = 'all'
+        msg = bot.send_message(chat_id, 'What is the minimum rating threshold?')
+        bot.register_next_step_handler(msg, askRating)
+    else:
+        msg = bot.send_message(chat_id, 'Enter the section correctly.')
+        bot.register_next_step_handler(msg, askSource)
+        return
 
 
 def askAge(message):
     chat_id = message.chat.id
-    text = message.text
-    if not text.isdigit():
-        msg = bot.send_message(chat_id, 'Age must be a number, enter again.')
+    text = message.text.lower()
+    filters = task.filters[0]
+    if text not in filters:
+        msg = bot.send_message(chat_id, 'There is no such time interval. Please enter the threshold correctly.')
         bot.register_next_step_handler(msg, askAge)
         return
-    bot.send_message(chat_id, 'Thank you, I remembered that you are {} y/o.'.format(text))
+    # task.myFilter = task.filters_code_names[0][filters.index(text)]
+    msg = bot.send_message(chat_id, 'How many pages are we parsing?')
+    bot.register_next_step_handler(msg, askAmount)
+
+
+def askRating(message):
+    chat_id = message.chat.id
+    text = message.text.lower()
+    filters = task.filters[1]
+    if text not in filters:
+        msg = bot.send_message(chat_id, 'There is no such threshold, enter the threshold correctly.')
+        bot.register_next_step_handler(msg, askRating)
+        return
+    # task.myFilter = task.filters_code_names[1][filters.index(text)]
+    msg = bot.send_message(chat_id, 'How many pages are we parsing?')
+    bot.register_next_step_handler(msg, askAmount)
+
+
+def askAmount(message):
+    chat_id = message.chat.id
+    text = message.text.lower()
+    if not text.isdigit():
+        msg = bot.send_message(chat_id, 'The number of pages must be a number. Please enter the correct number.')
+        bot.register_next_step_handler(msg, askAmount)
+        return
+    if int(text) < 1 or int(text) > 11:
+        msg = bot.send_message(chat_id, 'The number of pages must be > 0 and <11. Enter correctly.')
+        bot.register_next_step_handler(msg, askAmount)
+        return
+    task.isRunning = False
+    output = ''
+    if task.mySource == 'top':
+        output = parser.getTitlesFromTop(int(text), task.myFilter)
+    else:
+        output = parser.getTitlesFromAll(int(text), task.myFilter)
+    print("output is {}".format(output))
+    msg = bot.send_message(chat_id, output)
 
 
 @bot.message_handler(content_types=['text'])
@@ -41,4 +102,4 @@ def text_handler(message):
     bot.send_message(chat_id, 'Beautiful.')
 
 
-bot.polling()
+bot.polling(none_stop=True)
