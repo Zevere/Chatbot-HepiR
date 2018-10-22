@@ -2,6 +2,7 @@ import telebot
 import bs4
 from src.Task import Task
 import src.Parser as parser
+import src.markups as m
 
 # main variables
 TOKEN = "752142027:AAGCp47hpBa3LYkBgEXMUlftOABpndyqwOM"
@@ -14,7 +15,7 @@ task = Task()
 def start_handler(message):
     if not task.isRunning:
         chat_id = message.chat.id
-        msg = bot.send_message(chat_id, 'Where to parse?')
+        msg = bot.send_message(chat_id, 'Where to parse?', reply_markup=m.source_markup)
         bot.register_next_step_handler(msg, askSource)
         task.isRunning = True
 
@@ -24,7 +25,7 @@ def askSource(message):
     text = message.text.lower()
     if text in task.names[0]:
         task.mySource = 'top'
-        msg = bot.send_message(chat_id, 'For what time period?')
+        msg = bot.send_message(chat_id, 'For what time period?', reply_markup=m.age_markup)
         bot.register_next_step_handler(msg, askAge)
     elif text in task.names[1]:
         task.mySource = 'all'

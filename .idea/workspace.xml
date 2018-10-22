@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f4e6d775-4c7d-42c3-b983-487fac6a69f8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Task.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/markups.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/chatbot-hepir.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chatbot-hepir.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/requirements.txt" afterDir="false" />
     </list>
@@ -19,7 +20,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/chatbot_hepir$app.coverage" NAME="app Coverage Results" MODIFIED="1540241159447" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/chatbot_hepir$app.coverage" NAME="app Coverage Results" MODIFIED="1540242049895" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="-1014194901">
@@ -34,7 +35,7 @@
           <entry key="gitignore" value="1" />
           <entry key="key" value="1" />
           <entry key="pem" value="1" />
-          <entry key="py" value="9" />
+          <entry key="py" value="10" />
           <entry key="txt" value="1" />
           <entry key="yml" value="1" />
         </counts>
@@ -42,13 +43,13 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="4" />
-          <entry key="Python" value="9" />
+          <entry key="Python" value="10" />
           <entry key="YAML" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4360" />
+          <entry key="py" value="4921" />
           <entry key="txt" value="63" />
           <entry key="yml" value="2" />
         </counts>
@@ -56,7 +57,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="63" />
-          <entry key="Python" value="4360" />
+          <entry key="Python" value="4921" />
           <entry key="YAML" value="2" />
         </counts>
       </usages-collector>
@@ -78,29 +79,38 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="571">
-                  <caret line="46" column="37" selection-start-line="46" selection-start-column="33" selection-end-line="46" selection-end-column="37" />
+                <state relative-caret-position="527">
+                  <caret line="31" column="79" selection-start-line="31" selection-start-column="79" selection-end-line="31" selection-end-column="79" />
                   <folding>
                     <element signature="e#0#14#0" expanded="true" />
-                    <marker date="1540240726537" expanded="true" signature="515:1107" ph="..." />
-                    <marker date="1540240726537" expanded="true" signature="1127:2898" ph="..." />
-                    <marker date="1540240726537" expanded="true" signature="2149:2898" ph="..." />
-                    <marker date="1540240726537" expanded="true" signature="2896:2898" ph="..." />
-                    <marker date="1540240726537" expanded="true" signature="2969:3758" ph="..." />
-                    <marker date="1540240726537" expanded="true" signature="3681:3758" ph="..." />
+                    <marker date="1540242041075" expanded="true" signature="569:1188" ph="..." />
+                    <marker date="1540242041075" expanded="true" signature="1208:3024" ph="..." />
+                    <marker date="1540242041075" expanded="true" signature="2234:3024" ph="..." />
+                    <marker date="1540242041075" expanded="true" signature="3022:3024" ph="..." />
+                    <marker date="1540242041075" expanded="true" signature="3095:3884" ph="..." />
+                    <marker date="1540242041075" expanded="true" signature="3807:3884" ph="..." />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/markups.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="238">
+                  <caret line="14" column="41" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/Parser.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="153">
-                  <caret line="9" column="91" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="91" />
+                <state relative-caret-position="308">
+                  <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
                   <folding>
                     <element signature="e#0#21#0" expanded="true" />
                     <marker date="1540239499196" expanded="true" signature="851:856" ph="..." />
@@ -164,6 +174,7 @@
         <option value="$PROJECT_DIR$/src/Parser.py" />
         <option value="$PROJECT_DIR$/src/Task.py" />
         <option value="$PROJECT_DIR$/src/app.py" />
+        <option value="$PROJECT_DIR$/src/markups.py" />
       </list>
     </option>
   </component>
@@ -343,7 +354,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" weight="0.3286334" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.21583514" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3373102" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -413,6 +424,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <marker date="1540239499196" expanded="true" signature="851:856" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Task.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
@@ -423,29 +445,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/app.py">
+    <entry file="file://$PROJECT_DIR$/src/markups.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="571">
-          <caret line="46" column="37" selection-start-line="46" selection-start-column="33" selection-end-line="46" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-            <marker date="1540240726537" expanded="true" signature="515:1107" ph="..." />
-            <marker date="1540240726537" expanded="true" signature="1127:2898" ph="..." />
-            <marker date="1540240726537" expanded="true" signature="2149:2898" ph="..." />
-            <marker date="1540240726537" expanded="true" signature="2896:2898" ph="..." />
-            <marker date="1540240726537" expanded="true" signature="2969:3758" ph="..." />
-            <marker date="1540240726537" expanded="true" signature="3681:3758" ph="..." />
-          </folding>
+        <state relative-caret-position="238">
+          <caret line="14" column="41" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Parser.py">
+    <entry file="file://$PROJECT_DIR$/src/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="91" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="91" />
+        <state relative-caret-position="527">
+          <caret line="31" column="79" selection-start-line="31" selection-start-column="79" selection-end-line="31" selection-end-column="79" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
-            <marker date="1540239499196" expanded="true" signature="851:856" ph="..." />
+            <element signature="e#0#14#0" expanded="true" />
+            <marker date="1540242041075" expanded="true" signature="569:1188" ph="..." />
+            <marker date="1540242041075" expanded="true" signature="1208:3024" ph="..." />
+            <marker date="1540242041075" expanded="true" signature="2234:3024" ph="..." />
+            <marker date="1540242041075" expanded="true" signature="3022:3024" ph="..." />
+            <marker date="1540242041075" expanded="true" signature="3095:3884" ph="..." />
+            <marker date="1540242041075" expanded="true" signature="3807:3884" ph="..." />
           </folding>
         </state>
       </provider>
