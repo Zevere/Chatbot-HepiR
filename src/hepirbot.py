@@ -2,6 +2,8 @@ import json
 import os
 import requests
 
+from pprint import pprint
+
 from telegram.ext import (
         Updater,
         CommandHandler,
@@ -17,8 +19,10 @@ from telegram import (
         InputTextMessageContent
         )
 
+from pymongo import MongoClient
+
 # global vars
-VERSION="2.1.2"
+VERSION="2.1.3"
 UNDERSTANDABLE_LANGUAGE=('hello','bonjour','hi','greetings','sup')
 KNOWN_COMMANDS=('/start','/about','/caps <insert text>','/weather')
 
@@ -100,7 +104,14 @@ def main():
 
     hepirbot=HepiRBot(openweather_token)
 
+    # opening mlab mongodb connection
+    mongodb_uri='mongodb://kbmakevin:fastpath6479@ds227853.mlab.com:27853/'
+    mongodb_dbname='hepir'
+    client = MongoClient(mongodb_uri)
+    db = client[mongodb_dbname]
+
     print("Starting HepiR bot now...")
+    pprint(db)
 
     dispatcher.add_handler(CommandHandler('start',hepirbot.start))
     dispatcher.add_handler(MessageHandler(Filters.text,hepirbot.echo))

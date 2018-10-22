@@ -1,2 +1,6 @@
 python-telegram-bot
 requests
+pymongo
+flask
+
+pytelegrambotapi

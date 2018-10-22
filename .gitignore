@@ -115,3 +115,5 @@ dmypy.json
 scripts/node_modules/
 dist/
 !/scripts/build/
+cert.pem
+private.key
