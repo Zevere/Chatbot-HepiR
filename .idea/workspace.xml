@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f4e6d775-4c7d-42c3-b983-487fac6a69f8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/markups.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/chatbot-hepir.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chatbot-hepir.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
@@ -11,6 +10,7 @@
       <change beforePath="$PROJECT_DIR$/src/Parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/markups.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/markups.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/requirements.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -49,7 +49,7 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4921" />
+          <entry key="py" value="4922" />
           <entry key="txt" value="63" />
           <entry key="yml" value="2" />
         </counts>
@@ -57,7 +57,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="63" />
-          <entry key="Python" value="4921" />
+          <entry key="Python" value="4922" />
           <entry key="YAML" value="2" />
         </counts>
       </usages-collector>
@@ -82,16 +82,16 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="527">
-                  <caret line="31" column="79" selection-start-line="31" selection-start-column="79" selection-end-line="31" selection-end-column="79" />
+                <state relative-caret-position="119">
+                  <caret line="7" selection-start-line="7" selection-end-line="7" />
                   <folding>
                     <element signature="e#0#14#0" expanded="true" />
-                    <marker date="1540242041075" expanded="true" signature="569:1188" ph="..." />
-                    <marker date="1540242041075" expanded="true" signature="1208:3024" ph="..." />
-                    <marker date="1540242041075" expanded="true" signature="2234:3024" ph="..." />
-                    <marker date="1540242041075" expanded="true" signature="3022:3024" ph="..." />
-                    <marker date="1540242041075" expanded="true" signature="3095:3884" ph="..." />
-                    <marker date="1540242041075" expanded="true" signature="3807:3884" ph="..." />
+                    <marker date="1540242595329" expanded="true" signature="513:1132" ph="..." />
+                    <marker date="1540242595329" expanded="true" signature="1152:2968" ph="..." />
+                    <marker date="1540242595329" expanded="true" signature="2178:2968" ph="..." />
+                    <marker date="1540242595329" expanded="true" signature="2966:2968" ph="..." />
+                    <marker date="1540242595329" expanded="true" signature="3039:3828" ph="..." />
+                    <marker date="1540242595329" expanded="true" signature="3751:3828" ph="..." />
                   </folding>
                 </state>
               </provider>
@@ -173,8 +173,8 @@
         <option value="$PROJECT_DIR$/src/requirements.txt" />
         <option value="$PROJECT_DIR$/src/Parser.py" />
         <option value="$PROJECT_DIR$/src/Task.py" />
-        <option value="$PROJECT_DIR$/src/app.py" />
         <option value="$PROJECT_DIR$/src/markups.py" />
+        <option value="$PROJECT_DIR$/src/app.py" />
       </list>
     </option>
   </component>
@@ -454,16 +454,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="31" column="79" selection-start-line="31" selection-start-column="79" selection-end-line="31" selection-end-column="79" />
+        <state relative-caret-position="119">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
-            <marker date="1540242041075" expanded="true" signature="569:1188" ph="..." />
-            <marker date="1540242041075" expanded="true" signature="1208:3024" ph="..." />
-            <marker date="1540242041075" expanded="true" signature="2234:3024" ph="..." />
-            <marker date="1540242041075" expanded="true" signature="3022:3024" ph="..." />
-            <marker date="1540242041075" expanded="true" signature="3095:3884" ph="..." />
-            <marker date="1540242041075" expanded="true" signature="3807:3884" ph="..." />
+            <marker date="1540242595329" expanded="true" signature="513:1132" ph="..." />
+            <marker date="1540242595329" expanded="true" signature="1152:2968" ph="..." />
+            <marker date="1540242595329" expanded="true" signature="2178:2968" ph="..." />
+            <marker date="1540242595329" expanded="true" signature="2966:2968" ph="..." />
+            <marker date="1540242595329" expanded="true" signature="3039:3828" ph="..." />
+            <marker date="1540242595329" expanded="true" signature="3751:3828" ph="..." />
           </folding>
         </state>
       </provider>

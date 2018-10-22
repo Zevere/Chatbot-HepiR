@@ -5,7 +5,6 @@ import src.Parser as parser
 import src.markups as m
 
 # main variables
-TOKEN = "752142027:AAGCp47hpBa3LYkBgEXMUlftOABpndyqwOM"
 bot = telebot.TeleBot(TOKEN)
 task = Task()
 
