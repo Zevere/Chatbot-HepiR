@@ -44,8 +44,34 @@ def index():
     return 'Successful Connection'
 
 
+# Process webhook calls
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        # server understood request but will not fulfill it
+        flask.abort(403)
+
+
+@bot.message_handler(commands=['help', 'start'])
+def send_welcome(message):
+    bot.reply_to(message, "Hi there, I am HepirBot.")
+
+
+# remove all previous webhooks first, just in case
+bot.remove_webhook()
+time.sleep(0.1)
+
+# set webhook
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+                certificate=open(WEBHOOK_SSL_CERT, 'r'))
+
 # start flask server
-app.run(host=WEBHOOK_HOST,
+app.run(host='localhost',
         port=WEBHOOK_PORT,
         ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
         debug=True)
