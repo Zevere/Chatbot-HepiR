@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f4e6d775-4c7d-42c3-b983-487fac6a69f8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Procfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/chatbot-hepir.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chatbot-hepir.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
@@ -112,7 +111,7 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/webhook_flask_tgbot.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="308">
+                <state relative-caret-position="348">
                   <caret line="31" column="11" lean-forward="true" selection-start-line="31" selection-start-column="11" selection-end-line="31" selection-end-column="11" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
@@ -175,8 +174,8 @@
             <entry file="file://$PROJECT_DIR$/src/deploy_to_heroku.md">
               <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
                 <state split_layout="SPLIT">
-                  <first_editor relative-caret-position="357">
-                    <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+                  <first_editor relative-caret-position="34">
+                    <caret line="2" column="24" selection-start-line="2" selection-start-column="24" selection-end-line="2" selection-end-column="24" />
                   </first_editor>
                   <second_editor />
                 </state>
@@ -519,7 +518,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/webhook_flask_tgbot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
+        <state relative-caret-position="348">
           <caret line="31" column="11" lean-forward="true" selection-start-line="31" selection-start-column="11" selection-end-line="31" selection-end-column="11" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
@@ -533,8 +532,8 @@
     <entry file="file://$PROJECT_DIR$/src/deploy_to_heroku.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="357">
-            <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+          <first_editor relative-caret-position="34">
+            <caret line="2" column="24" selection-start-line="2" selection-start-column="24" selection-end-line="2" selection-end-column="24" />
           </first_editor>
           <second_editor />
         </state>

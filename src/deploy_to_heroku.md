@@ -1,9 +1,6 @@
 # Deploy to Heroku
 Have these files in root of folder
-- app.py
-- markups.py
-- Parser.py
-- Task.py
+- webhook_flask_tgbot.py
 - requirements.txt
 - Procfile
 
