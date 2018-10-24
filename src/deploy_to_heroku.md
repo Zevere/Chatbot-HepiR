@@ -8,7 +8,7 @@ Have these files in root of folder
 - Procfile
 
 ## Procfile contents
-`bot: python3 app.py`
+`web: python3 <app file name>.py`
 
 ## Heroku CLI commands
 1. `git init`
@@ -17,8 +17,8 @@ Have these files in root of folder
 4. `heroku buildpacks:set heroku/python`
 5. `git push heroku master`
 6. `heroku config:set TOKEN=<BOT TOKEN>`
-7. `heroku ps:scale bot=1`
+7. `heroku ps:scale web=1`
 8. `heroku logs --tail`
 
 To turn off bot
-1. `heroku ps:stop bot`
+1. `heroku ps:stop web`
