@@ -35,6 +35,11 @@ def get_message():
     return "", 200
 
 
+@app.route('/', methods=['GET'])
+def index():
+    return "Come check me out at https://t.me/ZevereBot!", 200
+
+
 @app.route('/getWebhookInfo')
 def get_webhook_info():
     return redirect('https://api.telegram.org/bot{}/getWebhookInfo'.format(TOKEN))

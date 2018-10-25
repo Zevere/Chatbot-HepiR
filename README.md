@@ -13,7 +13,7 @@ cd scripts && npm i && cd .. && node scripts/build
 ## to run the image to start up the bot
 
 ```sh
-docker run -it --env CONFIGS='{"bot_token":"BOT_TOKEN GOES HERE","openweather_token":"OPENWEATHER TOKEN GOES HERE"}' chatbot-hepir
+docker run -it -e TOKEN=<BOT_TOKEN> -e OPENWEATHER_TOKEN=<OpenWeather TOKEN> -e PORT=<port for flask app to run on> chatbot-hepir
 ```
 
 ## heroku cli commands used
