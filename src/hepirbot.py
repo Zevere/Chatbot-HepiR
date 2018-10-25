@@ -1,136 +1,174 @@
-import json
 import os
 import requests
-
+import datetime
+import telebot
+from flask import Flask, request, redirect
+from pymongo import MongoClient
 from pprint import pprint
 
-from telegram.ext import (
-        Updater,
-        CommandHandler,
-        MessageHandler,
-        Filters,
-        InlineQueryHandler
-        )
+# VARS ----------------------------------------------------------------------------------------------------
+VERSION = "3.0.0"
+UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
+KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
 
-from telegram import (
-        ReplyKeyboardMarkup,
-        KeyboardButton,
-        InlineQueryResultArticle,
-        InputTextMessageContent
-        )
+WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
 
-from pymongo import MongoClient
+# picked up from heroku configs
+TOKEN = os.environ['TOKEN']
+PORT = int(os.environ['PORT'])
+OPENWEATHER_TOKEN = os.environ['OPENWEATHER_TOKEN']
+# MONGODB_URI = os.environ['MONGODB_URI']
+# MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
+#
+# mongo_client = MongoClient(MONGODB_URI)
+# mongodb = mongo_client[MONGODB_DBNAME]
 
-# global vars
-VERSION="2.1.3"
-UNDERSTANDABLE_LANGUAGE=('hello','bonjour','hi','greetings','sup')
-KNOWN_COMMANDS=('/start','/about','/caps <insert text>','/weather')
+bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
 
-class HepiRBot:
-    def __init__(self,owt):
-        self.owt=owt
 
-    def start(self,bot,update):
-        print(update)
-        print_transaction(update,'start')
-        bot.send_message(chat_id=update.message.chat_id,text="I'm the HepiR bot, please talk to me!\n\nType /about to learn more about me :)!")
+# Flask Routes ------------------------------------------------------------------------------------------
+# webhook will send update to the bot, so need to process update messages received
+@app.route('/' + TOKEN, methods=['POST'])
+def get_message():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode('utf-8'))])
+    return "", 200
 
-    def about(self,bot,update):
-        print_transaction(update,'about')
-        bot.send_message(chat_id=update.message.chat_id,text="HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(VERSION,KNOWN_COMMANDS))
 
-    def echo(self,bot,update):
-        print_transaction(update,'',False)
-        bot.send_message(chat_id=update.message.chat_id,text=update.message.text)
+@app.route('/getWebhookInfo')
+def get_webhook_info():
+    return redirect('https://api.telegram.org/bot{}/getWebhookInfo'.format(TOKEN))
 
-    def caps(self,bot, update, args):
-        print_transaction(update,'caps')
-        text_caps=' '.join(args).upper()
-        bot.send_message(chat_id=update.message.chat_id,text=text_caps)
 
-    def inline_caps(self,bot,update):
-        query=update.inline_query.query
-        if not query:
-            return
-        results=list()
-        results.append(
-                InlineQueryResultArticle(
-                    id=query.upper(),
-                    title='Caps',
-                    input_message_content=InputTextMessageContent(query.upper())
-                    )
-                )
-        bot.answer_inline_query(update.inline_query.id,results)
+# Telegram Bot Command Handlers --------------------------------------------------------------------------
+@bot.message_handler(commands=['start'])
+def start(msg):
+    log_command_info('/start', msg)
+    bot.send_message(msg.chat.id,
+                     "Hello, {}. I'm the HepiR bot, please talk to me!\n\nType /about to learn more about me :)!".format(
+                         msg.from_user.first_name))
 
-    def unknown_command(self,bot,update):
-        print_transaction(update,'unknown_command')
-        bot.send_message(chat_id=update.message.chat_id,text="Sorry, I did not understand that command.")
 
-    def weather(self,bot,update):
-        print_transaction(update,'weather')
-        location_keyboard = KeyboardButton(text="send_location", request_location=True)
-        custom_keyboard=[[ location_keyboard, 'Cancel' ]]
-        reply_markup=ReplyKeyboardMarkup(custom_keyboard,one_time_keyboard=True)
-        bot.send_message(chat_id=update.message.chat_id,
-                text='Please share your location to determine the local weather.',
-                reply_markup=reply_markup)
+@bot.message_handler(commands=['about'])
+def about(msg):
+    log_command_info('/about', msg)
+    bot.send_message(msg.chat.id,
+                     "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
+                         VERSION, KNOWN_COMMANDS))
+    return
 
-    def location(self,bot,update):
-        fname=update.message.chat.first_name
-        lon=update.message.location.longitude
-        lat=update.message.location.latitude
-        bot.send_message(chat_id=update.message.chat_id,text='Thank you {}.\nI now know you are located at latitude: {}, longitude: {}'.format(fname,lat,lon))
-        local_weather=requests.get('https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric'.format(lon,lat,self.owt)).json()
-        bot.send_message(chat_id=update.message.chat_id,text='Your local weather is:\n\n{},{}\n{}\u00b0C\n{} with {}'.format(local_weather['name'],local_weather['sys']['country'],local_weather['main']['temp'],local_weather['weather'][0]['main'],local_weather['weather'][0]['description']))
-        print(update.message.location)
-        print('local weather: {}'.format(local_weather))
 
-# helper functions
-def print_transaction(update,cmd,is_command=True):
-    if cmd is "unknown_command":
-        print('Unknown command issued: "{}" by user: {}'.format(update.message.text,update.message.chat.first_name))
-    elif is_command:
-        print('Received "/{}" command from user: {}'.format(cmd,update.message.chat.first_name))
+@bot.message_handler(commands=['caps'])
+def caps(msg):
+    log_command_info(msg.text, msg)
+    args = extract_args(msg.text)
+    if len(args) > 0:
+        bot.reply_to(msg, "".join(map(lambda str: str.upper() + ' ', args)))
     else:
-        print('Received regular message: "{}" from user: {}'.format(update.message.text,update.message.chat.first_name))
-
-def main():
-    # read config from env file
-    CONFIGS=os.environ['CONFIGS']
-    bot_token=json.loads(CONFIGS)['bot_token']
-    openweather_token=json.loads(CONFIGS)['openweather_token']
-    updater=Updater(token=bot_token)
-    dispatcher=updater.dispatcher
-
-    hepirbot=HepiRBot(openweather_token)
-
-    # opening mlab mongodb connection
-    mongodb_uri='mongodb://kbmakevin:fastpath6479@ds227853.mlab.com:27853/'
-    mongodb_dbname='hepir'
-    client = MongoClient(mongodb_uri)
-    db = client[mongodb_dbname]
-
-    print("Starting HepiR bot now...")
-    pprint(db)
-
-    dispatcher.add_handler(CommandHandler('start',hepirbot.start))
-    dispatcher.add_handler(MessageHandler(Filters.text,hepirbot.echo))
-    dispatcher.add_handler(CommandHandler('caps',hepirbot.caps,pass_args=True))
-    dispatcher.add_handler(InlineQueryHandler(hepirbot.inline_caps))
-    dispatcher.add_handler(CommandHandler('about',hepirbot.about))
-    dispatcher.add_handler(CommandHandler('weather',hepirbot.weather))
-    dispatcher.add_handler(MessageHandler(Filters.location,hepirbot.location))
-    dispatcher.add_handler(MessageHandler(Filters.command,hepirbot.unknown_command))
-
-    updater.start_polling()
-
-    # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT
-    updater.idle()
+        return
 
 
-if __name__ == '__main__':
+@bot.inline_handler(lambda query: query)
+def query_text(inline_query):
     try:
-        main()
-    except KeyboardInterrupt:
-        exit()
+        r = telebot.types.InlineQueryResultArticle('1', 'Capitalize Message',
+                                                   telebot.types.InputTextMessageContent(inline_query.query.upper()))
+        log_inline_query_info(inline_query.query, inline_query)
+        bot.answer_inline_query(inline_query.id, [r])
+    except Exception as e:
+        print(e)
+
+
+@bot.message_handler(commands=['weather'])
+def weather(msg):
+    log_command_info(msg.text, msg)
+    location_keyboard = telebot.types.KeyboardButton(text='Send Location', request_location=True)
+
+    reply_markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    reply_markup.add(location_keyboard, 'Cancel')
+
+    bot.send_message(msg.chat.id, text='Please share your location to determine the local weather :).',
+                     reply_markup=reply_markup)
+    return
+
+
+@bot.message_handler(content_types=['location'])
+def process_location(msg):
+    log_received_text_msg(msg.location, msg)
+    fname = msg.chat.first_name
+    lon = msg.location.longitude
+    lat = msg.location.latitude
+    bot.send_message(msg.chat.id,
+                     'Thank you {}.\nI now know you are located at latitude: {}, longitude: {}'.format(fname, lat, lon))
+    local_weather = requests.get(
+        'https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric'.format(lon, lat,
+                                                                                                     OPENWEATHER_TOKEN)).json()
+    print('local weather: {}'.format(local_weather))
+
+    bot.send_message(msg.chat.id, 'Your local weather is:\n\n{},{}\n{}\u00b0C\n{} with {}'.format(local_weather['name'],
+                                                                                                  local_weather['sys'][
+                                                                                                      'country'],
+                                                                                                  local_weather['main'][
+                                                                                                      'temp'],
+                                                                                                  local_weather[
+                                                                                                      'weather'][0][
+                                                                                                      'main'],
+                                                                                                  local_weather[
+                                                                                                      'weather'][0][
+                                                                                                      'description']))
+    return
+
+
+@bot.message_handler(content_types=['text'])
+def echo_message(msg):
+    log_received_text_msg(msg.text, msg)
+    # first char, text starts with /, unknown command
+    if msg.text[0] == '/':
+        bot.reply_to(msg, 'Sorry, I did not understand the command: {}'.format(msg.text))
+    else:
+        bot.reply_to(msg, msg.text)
+
+
+# Helper methods ------------------------------------------------------------------------------------------
+# e.g. /caps what up dawg?! -> ['what', 'up', 'dawg?!']
+def extract_args(msg):
+    return msg.split()[1:]
+
+
+# setup webhook and any other initialization processes
+def init():
+    print("Starting HepiR bot now...")
+    # pprint(mongodb)
+    bot.remove_webhook()
+    # bot.polling(none_stop=True)
+    bot.set_webhook(url=WEBHOOK_URL + TOKEN)
+    # return "Set Webhook to: {}".format(WEBHOOK_URL + TOKEN), 200
+
+
+def log_command_info(cmd, msg):
+    print(
+        "[{}] Received '{}' command from '{}'".format(str(datetime.datetime.now()).split('.')[0], cmd,
+                                                      (str(msg.from_user.first_name) + " " + str(
+                                                          msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+    return
+
+
+def log_inline_query_info(query, msg):
+    print(
+        "[{}] Received inline query: '{}' from '{}'".format(str(datetime.datetime.now()).split('.')[0], query,
+                                                            (str(msg.from_user.first_name) + " " + str(
+                                                                msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+    return
+
+
+def log_received_text_msg(txt, msg):
+    print(
+        "[{}] Received text: '{}' from '{}'".format(str(datetime.datetime.now()).split('.')[0], txt,
+                                                    (str(msg.from_user.first_name) + " " + str(
+                                                        msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+    return
+
+
+if __name__ == "__main__":
+    init()
+    app.run(host='0.0.0.0', port=PORT)

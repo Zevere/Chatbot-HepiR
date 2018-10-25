@@ -27,6 +27,6 @@ heroku logs
 ```
 
 ## credits
-https://github.com/python-telegram-bot/python-telegram-bot
+https://github.com/eternnoir/pyTelegramBotAPI
 
 [Docker Badge]: https://img.shields.io/docker/pulls/zevere/chatbot-hepir.svg
