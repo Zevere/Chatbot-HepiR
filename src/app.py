@@ -1,106 +1,142 @@
-import telebot
 import os
-from src.Task import Task
-import src.Parser as parser
-import src.markups as m
+import datetime
+import telebot
+from flask import Flask, request, redirect
+from pymongo import MongoClient
+from pprint import pprint
 
-# main variables
-TOKEN = os.environ['TOKEN']
+# VARS ----------------------------------------------------------------------------------------------------
+VERSION = "3.0.0"
+UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
+KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
+
+WEBHOOK_URL = 'https://chatbot-hepir.herokuapp.com/'
+
+# picked up from heroku configs
+TOKEN = 'xD'
+OPENWEATHER_TOKEN = 'xD'
+PORT = 8443
+
+# TOKEN = os.environ['TOKEN']
+# PORT = int(os.environ['PORT'])
+# OPENWEATHER_TOKEN = os.environ['OPENWEATHER_TOKEN']
+# MONGODB_URI = os.environ['MONGODB_URI']
+# MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
+#
+# mongo_client = MongoClient(MONGODB_URI)
+# mongodb = mongo_client[MONGODB_DBNAME]
+
 bot = telebot.TeleBot(TOKEN)
-task = Task()
+app = Flask(__name__)
 
 
-# handlers
-@bot.message_handler(commands=['start', 'go'])
-def start_handler(message):
-    if not task.isRunning:
-        chat_id = message.chat.id
-        msg = bot.send_message(chat_id, 'Where to parse?', reply_markup=m.source_markup)
-        bot.register_next_step_handler(msg, askSource)
-        task.isRunning = True
+# Flask Routes ------------------------------------------------------------------------------------------
+# webhook will send update to the bot, so need to process update messages received
+@app.route('/' + TOKEN, methods=['POST'])
+def get_message():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode('utf-8'))])
+    return "", 200
 
 
-def askSource(message):
-    chat_id = message.chat.id
-    text = message.text.lower()
-    if text in task.names[0]:
-        task.mySource = 'top'
-        msg = bot.send_message(chat_id, 'For what time period?', reply_markup=m.age_markup)
-        bot.register_next_step_handler(msg, askAge)
-    elif text in task.names[1]:
-        task.mySource = 'all'
-        msg = bot.send_message(chat_id, 'What is the minimum rating threshold?')
-        bot.register_next_step_handler(msg, askRating)
+@app.route('/getWebhookInfo')
+def get_webhook_info():
+    return redirect('https://api.telegram.org/bot{}/getWebhookInfo'.format(TOKEN))
+
+
+# Telegram Bot Command Handlers --------------------------------------------------------------------------
+@bot.message_handler(commands=['start'])
+def start(msg):
+    log_command_info('/start', msg)
+    bot.send_message(msg.chat.id,
+                     "Hello, {}. I'm the HepiR bot, please talk to me!\n\nType /about to learn more about me :)!".format(
+                         msg.from_user.first_name))
+
+
+@bot.message_handler(commands=['about'])
+def about(msg):
+    log_command_info('/about', msg)
+    bot.send_message(msg.chat.id,
+                     "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
+                         VERSION, KNOWN_COMMANDS))
+    return
+
+
+@bot.message_handler(commands=['caps'])
+def caps(msg):
+    log_command_info(msg.text, msg)
+    args = extract_args(msg.text)
+    if len(args) > 0:
+        bot.reply_to(msg, "".join(map(lambda str: str.upper() + ' ', args)))
     else:
-        msg = bot.send_message(chat_id, 'Enter the section correctly.')
-        bot.register_next_step_handler(msg, askSource)
         return
 
 
-def askAge(message):
-    chat_id = message.chat.id
-    text = message.text.lower()
-    filters = task.filters[0]
-    if text not in filters:
-        msg = bot.send_message(chat_id, 'There is no such time interval. Please enter the threshold correctly.')
-        bot.register_next_step_handler(msg, askAge)
-        return
-    # task.myFilter = task.filters_code_names[0][filters.index(text)]
-    msg = bot.send_message(chat_id, 'How many pages are we parsing?')
-    bot.register_next_step_handler(msg, askAmount)
+@bot.inline_handler(lambda query: query)
+def query_text(inline_query):
+    try:
+        r = telebot.types.InlineQueryResultArticle('1', 'Capitalize Message',
+                                                   telebot.types.InputTextMessageContent(inline_query.query.upper()))
+        log_inline_query_info(inline_query.query, inline_query)
+        bot.answer_inline_query(inline_query.id, [r])
+    except Exception as e:
+        print(e)
 
 
-def askRating(message):
-    chat_id = message.chat.id
-    text = message.text.lower()
-    filters = task.filters[1]
-    if text not in filters:
-        msg = bot.send_message(chat_id, 'There is no such threshold, enter the threshold correctly.')
-        bot.register_next_step_handler(msg, askRating)
-        return
-    # task.myFilter = task.filters_code_names[1][filters.index(text)]
-    msg = bot.send_message(chat_id, 'How many pages are we parsing?')
-    bot.register_next_step_handler(msg, askAmount)
-
-
-def askAmount(message):
-    chat_id = message.chat.id
-    text = message.text.lower()
-    if not text.isdigit():
-        msg = bot.send_message(chat_id, 'The number of pages must be a number. Please enter the correct number.')
-        bot.register_next_step_handler(msg, askAmount)
-        return
-    if int(text) < 1 or int(text) > 11:
-        msg = bot.send_message(chat_id, 'The number of pages must be > 0 and <11. Enter correctly.')
-        bot.register_next_step_handler(msg, askAmount)
-        return
-    task.isRunning = False
-    output = ''
-    if task.mySource == 'top':
-        output = parser.getTitlesFromTop(int(text), task.myFilter)
-    else:
-        output = parser.getTitlesFromAll(int(text), task.myFilter)
-    print("output is {}".format(output))
-    msg = bot.send_message(chat_id, output)
+# @bot.message_handler(commands=['weather'])
+# def weather(msg):
+#     return
 
 
 @bot.message_handler(content_types=['text'])
-def text_handler(message):
-    text = message.text.lower()
-    chat_id = message.chat.id
-    if text == 'hello':
-        bot.send_message(chat_id, "Hello, I'm a bot-a huber parser.")
-    elif text == 'how are you?':
-        bot.send_message(chat_id, "Ok, and you?")
+def echo_message(msg):
+    log_received_text_msg(msg.text, msg)
+    # first char, text starts with /, unknown command
+    if msg.text[0] == '/':
+        bot.reply_to(msg, 'Sorry, I did not understand the command: {}'.format(msg.text))
     else:
-        bot.send_message(chat_id, "Sorry, I did not understand :(")
+        bot.reply_to(msg, msg.text)
 
 
-# content-types include: text, audio, document, photo, sticker, video, video_note, voice, location, contact, new_chat_members, left_chat_member, new_chat_title, new_chat_photo, delete_chat_photo, group_chat_created, supergroup_chat_created, channel_chat_created, migrate_to_chat_id, migrate_from_chat_id, pinned_message
-@bot.message_handler(content_types=['photo'])
-def text_handler(message):
-    chat_id = message.chat.id
-    bot.send_message(chat_id, 'Beautiful.')
+# Helper methods ------------------------------------------------------------------------------------------
+# e.g. /caps what up dawg?! -> ['what', 'up', 'dawg?!']
+def extract_args(msg):
+    return msg.split()[1:]
 
 
-bot.polling(none_stop=True)
+# setup webhook and any other initialization processes
+def init():
+    print("Starting HepiR bot now...")
+    # pprint(mongodb)
+    bot.remove_webhook()
+    bot.polling(none_stop=True)
+    # bot.set_webhook(url=WEBHOOK_URL + TOKEN)
+    # return "Set Webhook to: {}".format(WEBHOOK_URL + TOKEN), 200
+
+
+def log_command_info(cmd, msg):
+    print(
+        "[{}] Received '{}' command from '{}'".format(str(datetime.datetime.now()).split('.')[0], cmd,
+                                                      (str(msg.from_user.first_name) + " " + str(
+                                                          msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+    return
+
+
+def log_inline_query_info(query, msg):
+    print(
+        "[{}] Received inline query: '{}' from '{}'".format(str(datetime.datetime.now()).split('.')[0], query,
+                                                            (str(msg.from_user.first_name) + " " + str(
+                                                                msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+    return
+
+
+def log_received_text_msg(txt, msg):
+    print(
+        "[{}] Received text: '{}' from '{}'".format(str(datetime.datetime.now()).split('.')[0], txt,
+                                                    (str(msg.from_user.first_name) + " " + str(
+                                                        msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+    return
+
+
+if __name__ == "__main__":
+    init()
+    app.run(host='0.0.0.0', port=PORT)
