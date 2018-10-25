@@ -1,4 +1,5 @@
 import os
+import requests
 import datetime
 import telebot
 from flask import Flask, request, redirect
@@ -82,9 +83,44 @@ def query_text(inline_query):
         print(e)
 
 
-# @bot.message_handler(commands=['weather'])
-# def weather(msg):
-#     return
+@bot.message_handler(commands=['weather'])
+def weather(msg):
+    log_command_info(msg.text, msg)
+    location_keyboard = telebot.types.KeyboardButton(text='Send Location', request_location=True)
+
+    reply_markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    reply_markup.add(location_keyboard, 'Cancel')
+
+    bot.send_message(msg.chat.id, text='Please share your location to determine the local weather :).',
+                     reply_markup=reply_markup)
+    return
+
+
+@bot.message_handler(content_types=['location'])
+def process_location(msg):
+    log_received_text_msg(msg.location, msg)
+    fname = msg.chat.first_name
+    lon = msg.location.longitude
+    lat = msg.location.latitude
+    bot.send_message(msg.chat.id,
+                     'Thank you {}.\nI now know you are located at latitude: {}, longitude: {}'.format(fname, lat, lon))
+    local_weather = requests.get(
+        'https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric'.format(lon, lat,
+                                                                                                     OPENWEATHER_TOKEN)).json()
+    print('local weather: {}'.format(local_weather))
+
+    bot.send_message(msg.chat.id, 'Your local weather is:\n\n{},{}\n{}\u00b0C\n{} with {}'.format(local_weather['name'],
+                                                                                                  local_weather['sys'][
+                                                                                                      'country'],
+                                                                                                  local_weather['main'][
+                                                                                                      'temp'],
+                                                                                                  local_weather[
+                                                                                                      'weather'][0][
+                                                                                                      'main'],
+                                                                                                  local_weather[
+                                                                                                      'weather'][0][
+                                                                                                      'description']))
+    return
 
 
 @bot.message_handler(content_types=['text'])
