@@ -17,11 +17,14 @@ WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
 TOKEN = os.environ['TOKEN']
 PORT = int(os.environ['PORT'])
 OPENWEATHER_TOKEN = os.environ['OPENWEATHER_TOKEN']
-# MONGODB_URI = os.environ['MONGODB_URI']
-# MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
-#
-# mongo_client = MongoClient(MONGODB_URI)
-# mongodb = mongo_client[MONGODB_DBNAME]
+MONGODB_URI = os.environ['MONGODB_URI']
+MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
+MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
+BOT_USERNAME = os.environ['BOT_USERNAME']
+
+client = MongoClient(MONGODB_URI)
+db = client[MONGODB_DBNAME]
+user_collection = db[MONGODB_COLLECTION]
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
@@ -38,6 +41,44 @@ def get_message():
 @app.route('/', methods=['GET'])
 def index():
     return "Come check me out at https://t.me/ZevereBot!", 200
+
+
+# https://zv-s-chatbot-hepir.herokuapp.com/api/login-widget?zv-user=ZV_USER&id=TELEGRAM_USERID&first_name=TELEGRAM_FIRST_NAME&auth_date=CURR_EPOCH_TIME&hash=HASH
+@app.route('/api/login-widget', methods=['GET'])
+def login_widget():
+    auth_date = request.args.get('auth_date')
+    first_name = request.args.get('first_name')
+    tg_id = request.args.get('id')
+    zv_user = request.args.get('zv-user')
+    widget_hash = request.args.get('hash')
+
+    # TODO: telegram chat bot web app verifies that the authorization is sent by Telegram and not some third party
+
+    # if telegram userid does not exist, stores the telegram userid, and user's name in telegram chat bot database
+    if user_collection.find_one({
+        'zv_user': zv_user,
+        'tg_id': tg_id
+    }):
+        print('[{}] tg_id {} found in the database...{} is a returning user :)!'.format(
+            str(datetime.datetime.now()).split('.')[0], tg_id, first_name))
+        print('[{}] will not be adding tg_id {} to db'.format(str(datetime.datetime.now()).split('.')[0], tg_id))
+    else:
+        print('[{}] No users found matching'.format(str(datetime.datetime.now()).split('.')[0]))
+        print('[{}] adding tg_id {} to db...'.format(str(datetime.datetime.now()).split('.')[0], tg_id))
+        new_user_id = user_collection.insert_one({
+            'zv_user': zv_user,
+            'tg_id': tg_id
+        }).inserted_id
+        print('[{}] new user inserted into db: {}'.format(str(datetime.datetime.now()).split('.')[0], new_user_id))
+
+    # TODO: Telegram Chat Bot Web App sends POST request with username: ZV_USER and chatUserId: TELEGRAM_USER_ID to https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations
+
+    # sends feedback to user confirming login
+    requests.get(
+        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged into Zevere via the Login Widget :)!'.format(
+            TOKEN, tg_id))
+
+    return redirect('https://t.me/{}'.format(BOT_USERNAME))
 
 
 @app.route('/getWebhookInfo')
@@ -143,7 +184,6 @@ def extract_args(msg):
 # setup webhook and any other initialization processes
 def init():
     print("Starting HepiR bot now...")
-    # pprint(mongodb)
     bot.remove_webhook()
     # bot.polling(none_stop=True)
     bot.set_webhook(url=WEBHOOK_URL + TOKEN)
@@ -152,28 +192,34 @@ def init():
 
 def log_command_info(cmd, msg):
     print(
-        "[{}] Received '{}' command from '{}'".format(str(datetime.datetime.now()).split('.')[0], cmd,
-                                                      (str(msg.from_user.first_name) + " " + str(
-                                                          msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+        "[{}] Received '{}' command from '{}' (ID={})".format(str(datetime.datetime.now()).split('.')[0],
+                                                              cmd,
+                                                              (str(msg.from_user.first_name) + " " + str(
+                                                                  msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name,
+                                                              msg.from_user.id))
     return
 
 
 def log_inline_query_info(query, msg):
     print(
-        "[{}] Received inline query: '{}' from '{}'".format(str(datetime.datetime.now()).split('.')[0], query,
-                                                            (str(msg.from_user.first_name) + " " + str(
-                                                                msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+        "[{}] Received inline query: '{}' from '{}' (ID={})".format(
+            str(datetime.datetime.now()).split('.')[0], query,
+            (str(msg.from_user.first_name) + " " + str(
+                msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name,
+            msg.from_user.id))
     return
 
 
 def log_received_text_msg(txt, msg):
     print(
-        "[{}] Received text: '{}' from '{}'".format(str(datetime.datetime.now()).split('.')[0], txt,
-                                                    (str(msg.from_user.first_name) + " " + str(
-                                                        msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name))
+        "[{}] Received text: '{}' from '{}' (ID={})".format(str(datetime.datetime.now()).split('.')[0], txt,
+                                                            (str(msg.from_user.first_name) + " " + str(
+                                                                msg.from_user.last_name)) if msg.from_user.last_name is not None else msg.from_user.first_name,
+                                                            msg.from_user.id))
     return
 
 
 if __name__ == "__main__":
     init()
+    # app.run(host='localhost', port=PORT)
     app.run(host='0.0.0.0', port=PORT)
