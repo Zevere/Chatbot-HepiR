@@ -122,3 +122,7 @@ cert.pem
 private.key
 webhook_cert.pem
 webhook_pkey.pem
+
+# dev env
+secret_stuff
+dev_env*

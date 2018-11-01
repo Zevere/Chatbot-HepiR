@@ -7,20 +7,27 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.0.0"
+VERSION = "3.2.2"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
 
-WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
+LOCAL_ENV = False
 
-# picked up from heroku configs
-TOKEN = os.environ['TOKEN']
-PORT = int(os.environ['PORT'])
-OPENWEATHER_TOKEN = os.environ['OPENWEATHER_TOKEN']
-MONGODB_URI = os.environ['MONGODB_URI']
-MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
-MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
-BOT_USERNAME = os.environ['BOT_USERNAME']
+if LOCAL_ENV:
+    from src.dev_env import *
+else:
+    WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
+
+    # picked up from heroku configs
+    TOKEN = os.environ['TOKEN']
+    PORT = int(os.environ['PORT'])
+    OPENWEATHER_TOKEN = os.environ['OPENWEATHER_TOKEN']
+    MONGODB_URI = os.environ['MONGODB_URI']
+    MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
+    MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
+    BOT_USERNAME = os.environ['BOT_USERNAME']
+    # VIVID_USER = os.environ['VIVID_USER']
+    # VIVID_PASSWORD = os.environ['VIVID_PASSWORD']
 
 client = MongoClient(MONGODB_URI)
 db = client[MONGODB_DBNAME]
@@ -183,11 +190,13 @@ def extract_args(msg):
 
 # setup webhook and any other initialization processes
 def init():
-    print("Starting HepiR bot now...")
+    print("[{}] Starting HepiR using (BOT_NAME={}) and (TOKEN={}) now...".format(
+        str(datetime.datetime.now()).split('.')[0], BOT_USERNAME, TOKEN))
     bot.remove_webhook()
-    # bot.polling(none_stop=True)
-    bot.set_webhook(url=WEBHOOK_URL + TOKEN)
-    # return "Set Webhook to: {}".format(WEBHOOK_URL + TOKEN), 200
+    if LOCAL_ENV:
+        bot.polling(none_stop=True)
+    else:
+        bot.set_webhook(url=WEBHOOK_URL + TOKEN)
 
 
 def log_command_info(cmd, msg):
@@ -221,5 +230,4 @@ def log_received_text_msg(txt, msg):
 
 if __name__ == "__main__":
     init()
-    # app.run(host='localhost', port=PORT)
     app.run(host='0.0.0.0', port=PORT)
