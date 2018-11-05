@@ -7,7 +7,7 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.3.0"
+VERSION = "3.3.1"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
 
@@ -157,8 +157,8 @@ def login_widget():
 
     # sends feedback to user confirming login
     requests.get(
-        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged into Zevere via the Login Widget :)!'.format(
-            TOKEN, tg_id))
+        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged in as {}!'.format(
+            TOKEN, tg_id, zv_user))
 
     return redirect('https://t.me/{}'.format(BOT_USERNAME))
 
