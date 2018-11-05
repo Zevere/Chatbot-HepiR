@@ -7,7 +7,7 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.2.2"
+VERSION = "3.3.0"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
 
@@ -26,8 +26,8 @@ else:
     MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
     MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
     BOT_USERNAME = os.environ['BOT_USERNAME']
-    # VIVID_USER = os.environ['VIVID_USER']
-    # VIVID_PASSWORD = os.environ['VIVID_PASSWORD']
+    VIVID_USER = os.environ['VIVID_USER']
+    VIVID_PASSWORD = os.environ['VIVID_PASSWORD']
 
 client = MongoClient(MONGODB_URI)
 db = client[MONGODB_DBNAME]
@@ -61,24 +61,99 @@ def login_widget():
 
     # TODO: telegram chat bot web app verifies that the authorization is sent by Telegram and not some third party
 
-    # if telegram userid does not exist, stores the telegram userid, and user's name in telegram chat bot database
-    if user_collection.find_one({
-        'zv_user': zv_user,
-        'tg_id': tg_id
-    }):
-        print('[{}] tg_id {} found in the database...{} is a returning user :)!'.format(
-            str(datetime.datetime.now()).split('.')[0], tg_id, first_name))
-        print('[{}] will not be adding tg_id {} to db'.format(str(datetime.datetime.now()).split('.')[0], tg_id))
-    else:
-        print('[{}] No users found matching'.format(str(datetime.datetime.now()).split('.')[0]))
-        print('[{}] adding tg_id {} to db...'.format(str(datetime.datetime.now()).split('.')[0], tg_id))
-        new_user_id = user_collection.insert_one({
+    # check if zv_user already exists; duplicate users results in 503 error from VIVID API
+    should_connect_hepir = False
+    vivid_request = requests.get('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations/{}'.format(zv_user),
+                                 auth=(VIVID_USER, VIVID_PASSWORD))
+
+    print(
+        '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
+                                                                             vivid_request.request,
+                                                                             vivid_request.url,
+                                                                             vivid_request.status_code))
+
+    # status_code == 200
+    # USE CASE 1: zv_user registered in Zevere and connected with Calista but NOT HepiR
+    if vivid_request.status_code == 200:
+        print('[{}] User registration found for ({})'.format(str(datetime.datetime.now()).split('.')[0], zv_user))
+        pprint(vivid_request.json())
+        should_connect_hepir = True
+
+    # status_code == 400
+    # USE CASE 2: zv_user is not registered in Zevere
+    elif vivid_request.status_code == 400:
+        print('[{}] User ID ({}) is invalid or does not exist'.format(str(datetime.datetime.now()).split('.')[0],
+                                                                      zv_user))
+        pprint(vivid_request.json())
+        # should never get here because can only access Login Widget workflow on Profile page after logging in via Coherent
+
+    # status_code == 404
+    # USE CASE 3: zv_user is registered but not connected to Calista or HepiR
+    elif vivid_request.status_code == 404:
+        print('[{}] User ({}) has not registered with any of the Zevere chat bots'.format(
+            str(datetime.datetime.now()).split('.')[0], zv_user))
+        pprint(vivid_request.json())
+        should_connect_hepir = True
+
+    # connect zv_user to tg_id if not exists in hepir db
+    # send post with {
+    #   "username": "string",
+    #   "chatUserId": "string"
+    # }
+    # as payload to vivid api
+    if should_connect_hepir:
+        # if user connection already in hepir db, don't add again
+        if user_collection.find_one({
             'zv_user': zv_user,
             'tg_id': tg_id
-        }).inserted_id
-        print('[{}] new user inserted into db: {}'.format(str(datetime.datetime.now()).split('.')[0], new_user_id))
+        }):
+            print('[{}] (zv_user={}, tg_id={}) found in (db={}) => {} is a returning user :)!'.format(
+                str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME, first_name))
+            print('[{}] will not be adding (zv_user={}, tg_id={}) to (db={})'.format(
+                str(datetime.datetime.now()).split('.')[0], zv_user,
+                tg_id, MONGODB_DBNAME))
 
-    # TODO: Telegram Chat Bot Web App sends POST request with username: ZV_USER and chatUserId: TELEGRAM_USER_ID to https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations
+        # zv user - tg user connection not found in hepir db => add connection to hepir db
+        else:
+            print(
+                '[{}] No users found matching (zv_user={}, tg_id={}) in (db={})'.format(
+                    str(datetime.datetime.now()).split('.')[0],
+                    zv_user, tg_id, MONGODB_DBNAME))
+            print('[{}] adding (zv_user={}, tg_id={}) to (db={})...'.format(str(datetime.datetime.now()).split('.')[0],
+                                                                            zv_user, tg_id, MONGODB_DBNAME))
+            new_user_id = user_collection.insert_one({
+                'zv_user': zv_user,
+                'tg_id': tg_id
+            }).inserted_id
+            print('[{}] new user (zv_user={}, tg_id={}) inserted into (db={}): (inserted_id={})'.format(
+                str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME,
+                new_user_id))
+
+            # send post request to vivid api with payload containing zv user and tg user id
+            vivid_request = requests.post('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations',
+                                          json={"username": zv_user, "chatUserId": tg_id},
+                                          auth=(VIVID_USER, VIVID_PASSWORD))
+
+            print('vivid_request is: {}'.format(vivid_request))
+            print('[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(
+                str(datetime.datetime.now()).split('.')[0],
+                vivid_request.request,
+                vivid_request.url,
+                vivid_request.status_code))
+            print('[{}] The json of the vivid_request ([{}]: {}) is: {}'.format(
+                str(datetime.datetime.now()).split('.')[0],
+                vivid_request.request,
+                vivid_request.url,
+                vivid_request.json()))
+
+            if vivid_request.status_code == 201:
+                print(
+                    '[{}] Zevere User (zv_user={}) has been succesfully connected to telegram account (tg_id={})'.format(
+                        str(datetime.datetime.now()).split('.')[0], zv_user, tg_id))
+            elif vivid_request.status_code == 400:
+                print(
+                    '[{}] There are invalid fields in the POST request to VIVID API or the username (zv_user={}) does not exist on Zevere'.format(
+                        str(datetime.datetime.now()).split('.')[0], zv_user))
 
     # sends feedback to user confirming login
     requests.get(
@@ -94,6 +169,111 @@ def get_webhook_info():
 
 
 # Telegram Bot Command Handlers --------------------------------------------------------------------------
+# @bot.message_handler(commands=['login'])
+# def login(msg):
+#     log_command_info('/login', msg)
+#
+#     # TODO: Send message with link which tells user to login to Coherent and then go to /profile and click on login widget
+#     # if logged in, simply let them know who they are logged in as. and provide friendly message
+#
+#     zv_user = 'kevin.ma'
+#     tg_id = '289934826'
+#     first_name = 'Kevin'
+# # check if zv_user already exists; duplicate users results in 503 error from VIVID API
+# should_connect_hepir = False
+# vivid_request = requests.get('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations/{}'.format(zv_user),
+#                              auth=(VIVID_USER, VIVID_PASSWORD))
+#
+# print(
+#     '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
+#                                                                          vivid_request.request,
+#                                                                          vivid_request.url,
+#                                                                          vivid_request.status_code))
+#
+# # status_code == 200
+# # USE CASE 1: zv_user registered in Zevere and connected with Calista but NOT HepiR
+# if vivid_request.status_code == 200:
+#     print('[{}] User registration found for ({})'.format(str(datetime.datetime.now()).split('.')[0], zv_user))
+#     pprint(vivid_request.json())
+#     should_connect_hepir = True
+#
+# # status_code == 400
+# # USE CASE 2: zv_user is not registered in Zevere
+# elif vivid_request.status_code == 400:
+#     print('[{}] User ID ({}) is invalid or does not exist'.format(str(datetime.datetime.now()).split('.')[0],
+#                                                                   zv_user))
+#     pprint(vivid_request.json())
+#     # should never get here because can only access Login Widget workflow on Profile page after logging in via Coherent
+#
+# # status_code == 404
+# # USE CASE 3: zv_user is registered but not connected to Calista or HepiR
+# elif vivid_request.status_code == 404:
+#     print('[{}] User ({}) has not registered with any of the Zevere chat bots'.format(
+#         str(datetime.datetime.now()).split('.')[0], zv_user))
+#     pprint(vivid_request.json())
+#     should_connect_hepir = True
+#
+# # connect zv_user to tg_id if not exists in hepir db
+# # send post with {
+# #   "username": "string",
+# #   "chatUserId": "string"
+# # }
+# # as payload to vivid api
+# if should_connect_hepir:
+#     # if user connection already in hepir db, don't add again
+#     if user_collection.find_one({
+#         'zv_user': zv_user,
+#         'tg_id': tg_id
+#     }):
+#         print('[{}] (zv_user={}, tg_id={}) found in (db={}) => {} is a returning user :)!'.format(
+#             str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME, first_name))
+#         print('[{}] will not be adding (zv_user={}, tg_id={}) to (db={})'.format(
+#             str(datetime.datetime.now()).split('.')[0], zv_user,
+#             tg_id, MONGODB_DBNAME))
+#
+#     # zv user - tg user connection not found in hepir db => add connection to hepir db
+#     else:
+#         print(
+#             '[{}] No users found matching (zv_user={}, tg_id={}) in (db={})'.format(
+#                 str(datetime.datetime.now()).split('.')[0],
+#                 zv_user, tg_id, MONGODB_DBNAME))
+#         print('[{}] adding (zv_user={}, tg_id={}) to (db={})...'.format(str(datetime.datetime.now()).split('.')[0],
+#                                                                         zv_user, tg_id, MONGODB_DBNAME))
+#         new_user_id = user_collection.insert_one({
+#             'zv_user': zv_user,
+#             'tg_id': tg_id
+#         }).inserted_id
+#         print('[{}] new user (zv_user={}, tg_id={}) inserted into (db={}): (inserted_id={})'.format(
+#             str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME,
+#             new_user_id))
+#
+#         # send post request to vivid api with payload containing zv user and tg user id
+#         vivid_request = requests.post('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations',
+#                                       json={"username": zv_user, "chatUserId": tg_id},
+#                                       auth=(VIVID_USER, VIVID_PASSWORD))
+#
+#         print('vivid_request is: {}'.format(vivid_request))
+#         print('[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(
+#             str(datetime.datetime.now()).split('.')[0],
+#             vivid_request.request,
+#             vivid_request.url,
+#             vivid_request.status_code))
+#         print('[{}] The json of the vivid_request ([{}]: {}) is: {}'.format(
+#             str(datetime.datetime.now()).split('.')[0],
+#             vivid_request.request,
+#             vivid_request.url,
+#             vivid_request.json()))
+#
+#         if vivid_request.status_code == 201:
+#             print(
+#                 '[{}] Zevere User (zv_user={}) has been succesfully connected to telegram account (tg_id={})'.format(
+#                     str(datetime.datetime.now()).split('.')[0], zv_user, tg_id))
+#         elif vivid_request.status_code == 400:
+#             print(
+#                 '[{}] There are invalid fields in the POST request to VIVID API or the username (zv_user={}) does not exist on Zevere'.format(
+#                     str(datetime.datetime.now()).split('.')[0], zv_user))
+
+
 @bot.message_handler(commands=['start'])
 def start(msg):
     log_command_info('/start', msg)
@@ -125,7 +305,8 @@ def caps(msg):
 def query_text(inline_query):
     try:
         r = telebot.types.InlineQueryResultArticle('1', 'Capitalize Message',
-                                                   telebot.types.InputTextMessageContent(inline_query.query.upper()))
+                                                   telebot.types.InputTextMessageContent(
+                                                       inline_query.query.upper()))
         log_inline_query_info(inline_query.query, inline_query)
         bot.answer_inline_query(inline_query.id, [r])
     except Exception as e:
@@ -152,23 +333,25 @@ def process_location(msg):
     lon = msg.location.longitude
     lat = msg.location.latitude
     bot.send_message(msg.chat.id,
-                     'Thank you {}.\nI now know you are located at latitude: {}, longitude: {}'.format(fname, lat, lon))
+                     'Thank you {}.\nI now know you are located at latitude: {}, longitude: {}'.format(fname, lat,
+                                                                                                       lon))
     local_weather = requests.get(
         'https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric'.format(lon, lat,
                                                                                                      OPENWEATHER_TOKEN)).json()
     print('local weather: {}'.format(local_weather))
 
-    bot.send_message(msg.chat.id, 'Your local weather is:\n\n{},{}\n{}\u00b0C\n{} with {}'.format(local_weather['name'],
-                                                                                                  local_weather['sys'][
-                                                                                                      'country'],
-                                                                                                  local_weather['main'][
-                                                                                                      'temp'],
-                                                                                                  local_weather[
-                                                                                                      'weather'][0][
-                                                                                                      'main'],
-                                                                                                  local_weather[
-                                                                                                      'weather'][0][
-                                                                                                      'description']))
+    bot.send_message(msg.chat.id,
+                     'Your local weather is:\n\n{},{}\n{}\u00b0C\n{} with {}'.format(local_weather['name'],
+                                                                                     local_weather['sys'][
+                                                                                         'country'],
+                                                                                     local_weather['main'][
+                                                                                         'temp'],
+                                                                                     local_weather[
+                                                                                         'weather'][0][
+                                                                                         'main'],
+                                                                                     local_weather[
+                                                                                         'weather'][0][
+                                                                                         'description']))
     return
 
 
