@@ -7,7 +7,7 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.4.3"
+VERSION = "3.4.4"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/caps <insert text>')
 
@@ -159,7 +159,7 @@ def login_widget():
 
     # sends feedback to user confirming login
     requests.get(
-        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged in to Zevere as {}!'.format(
+        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged in to Zevere with the id of {}!'.format(
             TOKEN, tg_id, zv_user))
 
     return redirect('https://t.me/{}'.format(BOT_USERNAME))
@@ -200,9 +200,12 @@ def get_profile(msg):
         print('found this resp:')
         pprint(resp)
 
+        # bot.send_message(msg.chat.id,
+        #                  'You are logged into Zevere as `{}`\n---\nProfile\n---\nZevere Id: `{}`\nFirst Name: {}\nLast Name: {}\n Joined At: {}'.format(
+        #                      zv_user, zv_user, fname, lname, joined_at), parse_mode="Markdown")
+
         bot.send_message(msg.chat.id,
-                         'You are logged into Zevere as `{}`\n---\nProfile\n---\nZevere Id: `{}`\nFirst Name: {}\nLast Name: {}\n Joined At: {}'.format(
-                             zv_user, zv_user, fname, lname, joined_at), parse_mode="Markdown")
+                         'You are logged in as *{} {}* (`{}`).'.format(fname, lname, zv_user), parse_mode="Markdown")
 
     # zv user - tg user connection not found in hepir db => add connection to hepir db
     else:
@@ -236,8 +239,9 @@ def login(msg):
             auth=(VIVID_USER, VIVID_PASSWORD))
 
         bot.send_message(msg.chat.id,
-                         'You are  currently logged into Zevere as `{}`\nWelcome, {} :)'.format(zv_user,
-                                                                                                msg.from_user.first_name),
+                         'You are  currently logged into Zevere as (`{}`)\nWelcome, {}. I hope you are Hepi ;)!'.format(
+                             zv_user,
+                             msg.from_user.first_name),
                          parse_mode="Markdown")
 
     # zv user - tg user connection not found in hepir db => add connection to hepir db
