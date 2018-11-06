@@ -116,7 +116,7 @@ def login_widget():
                 tg_id, MONGODB_DBNAME))
 
             requests.get(
-                'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You are already logged in to Zevere with the id of `{}`!parse_mode=Markdown'.format(
+                'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You are already logged in to Zevere with the id of `{}`!&parse_mode=Markdown'.format(
                     TOKEN, tg_id, zv_user))
 
         # if zv_user connected to another tg_id, don't connect
@@ -124,7 +124,7 @@ def login_widget():
             'zv_user': zv_user
         }):
             requests.get(
-                'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Zevere User ID `{}` is already connected to antoher telegram account!parse_mode=Markdown'.format(
+                'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Zevere User ID `{}` is already connected to antoher telegram account!&parse_mode=Markdown'.format(
                     TOKEN, tg_id, zv_user))
 
         # if tg_id connected to another zv_user, don't connect
@@ -132,7 +132,7 @@ def login_widget():
             'tg_id': tg_id
         }):
             requests.get(
-                'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Your telegram account is already connected to another Zevere ID!parse_mode=Markdown'.format(
+                'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Your telegram account is already connected to another Zevere ID!&parse_mode=Markdown'.format(
                     TOKEN, tg_id))
 
         # zv user - tg user connection not found in hepir db => add connection to hepir db
@@ -173,7 +173,7 @@ def login_widget():
                     '[{}] Zevere User (zv_user={}) has been succesfully connected to telegram account (tg_id={})'.format(
                         str(datetime.datetime.now()).split('.')[0], zv_user, tg_id))
                 requests.get(
-                    'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have successfully connected your telegram account to the Zevere ID: `{}`!parse_mode=Markdown'.format(
+                    'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have successfully connected your telegram account to the Zevere ID: `{}`!&parse_mode=Markdown'.format(
                         TOKEN, tg_id, zv_user))
 
             elif vivid_request.status_code == 400:
@@ -181,7 +181,7 @@ def login_widget():
                     '[{}] There are invalid fields in the POST request to VIVID API or the username (zv_user={}) does not exist on Zevere'.format(
                         str(datetime.datetime.now()).split('.')[0], zv_user))
                 requests.get(
-                    'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Unable to connect your telegram account to the Zevere ID: `{}` due to internal server errors!parse_mode=Markdown'.format(
+                    'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Unable to connect your telegram account to the Zevere ID: `{}` due to internal server errors!&parse_mode=Markdown'.format(
                         TOKEN, tg_id, zv_user))
 
     else:
