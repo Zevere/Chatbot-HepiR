@@ -7,7 +7,7 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.3.1"
+VERSION = "3.3.2"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
 
@@ -21,7 +21,6 @@ else:
     # picked up from heroku configs
     TOKEN = os.environ['TOKEN']
     PORT = int(os.environ['PORT'])
-    OPENWEATHER_TOKEN = os.environ['OPENWEATHER_TOKEN']
     MONGODB_URI = os.environ['MONGODB_URI']
     MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
     MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
@@ -169,6 +168,11 @@ def get_webhook_info():
 
 
 # Telegram Bot Command Handlers --------------------------------------------------------------------------
+# @bot.message_handler(commands=['me'])
+# def get_profile(msg):
+#     log_command_info('/me', msg)
+
+
 # @bot.message_handler(commands=['login'])
 # def login(msg):
 #     log_command_info('/login', msg)
@@ -311,49 +315,6 @@ def query_text(inline_query):
         bot.answer_inline_query(inline_query.id, [r])
     except Exception as e:
         print(e)
-
-
-@bot.message_handler(commands=['weather'])
-def weather(msg):
-    log_command_info(msg.text, msg)
-    location_keyboard = telebot.types.KeyboardButton(text='Send Location', request_location=True)
-
-    reply_markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    reply_markup.add(location_keyboard, 'Cancel')
-
-    bot.send_message(msg.chat.id, text='Please share your location to determine the local weather :).',
-                     reply_markup=reply_markup)
-    return
-
-
-@bot.message_handler(content_types=['location'])
-def process_location(msg):
-    log_received_text_msg(msg.location, msg)
-    fname = msg.chat.first_name
-    lon = msg.location.longitude
-    lat = msg.location.latitude
-    bot.send_message(msg.chat.id,
-                     'Thank you {}.\nI now know you are located at latitude: {}, longitude: {}'.format(fname, lat,
-                                                                                                       lon))
-    local_weather = requests.get(
-        'https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric'.format(lon, lat,
-                                                                                                     OPENWEATHER_TOKEN)).json()
-    print('local weather: {}'.format(local_weather))
-
-    bot.send_message(msg.chat.id,
-                     'Your local weather is:\n\n{},{}\n{}\u00b0C\n{} with {}'.format(local_weather['name'],
-                                                                                     local_weather['sys'][
-                                                                                         'country'],
-                                                                                     local_weather['main'][
-                                                                                         'temp'],
-                                                                                     local_weather[
-                                                                                         'weather'][0][
-                                                                                         'main'],
-                                                                                     local_weather[
-                                                                                         'weather'][0][
-                                                                                         'description']))
-    return
-
 
 @bot.message_handler(content_types=['text'])
 def echo_message(msg):
