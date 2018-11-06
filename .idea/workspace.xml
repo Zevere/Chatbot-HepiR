@@ -24,7 +24,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/chatbot_hepir$webhook_flask_tgbot.coverage" NAME="webhook_flask_tgbot Coverage Results" MODIFIED="1540419986860" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/chatbot_hepir$hepirbot.coverage" NAME="hepirbot Coverage Results" MODIFIED="1541470836395" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/chatbot_hepir$hepirbot.coverage" NAME="hepirbot Coverage Results" MODIFIED="1541473224852" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/chatbot_hepir$app.coverage" NAME="app Coverage Results" MODIFIED="1540939310460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
   <component name="DatabaseView">
@@ -109,12 +109,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="2518" />
+          <entry key="py" value="2613" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="2518" />
+          <entry key="Python" value="2613" />
         </counts>
       </usages-collector>
     </session>
@@ -133,13 +133,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/hepirbot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="21" column="34" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
+            <state relative-caret-position="315">
+              <caret line="236" lean-forward="true" selection-start-line="236" selection-end-line="236" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
-                <marker date="1541471955478" expanded="true" signature="8030:8031" ph="..." />
-                <marker date="1541471955478" expanded="true" signature="8030:9727" ph="..." />
-                <marker date="1541471955478" expanded="true" signature="9787:15181" ph="..." />
+                <marker date="1541473496068" expanded="true" signature="8052:8053" ph="..." />
+                <marker date="1541473496068" expanded="true" signature="8052:9970" ph="..." />
+                <marker date="1541473496068" expanded="true" signature="10026:11482" ph="..." />
               </folding>
             </state>
           </provider>
@@ -215,11 +215,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>node</find>
-      <find>code</find>
-      <find>web</find>
-      <find>json</find>
-      <find>_id</find>
       <find>weather</find>
       <find>wea</find>
       <find>location</find>
@@ -245,6 +240,11 @@
       <find>msg.chat.id</find>
       <find>PORT</find>
       <find>you are not logged</find>
+      <find>logged in as</find>
+      <find>logged in</find>
+      <find>insert</find>
+      <find>login</find>
+      <find>first</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -478,12 +478,12 @@
     <frame x="145" y="74" width="1526" height="961" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1882674" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1882674" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.329718" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.30471584" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.30471584" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -644,13 +644,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/dev_env.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/deploy/deploy_heroku.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="595">
@@ -658,15 +651,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/dev_env.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/hepirbot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="21" column="34" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
+        <state relative-caret-position="315">
+          <caret line="236" lean-forward="true" selection-start-line="236" selection-end-line="236" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-            <marker date="1541471955478" expanded="true" signature="8030:8031" ph="..." />
-            <marker date="1541471955478" expanded="true" signature="8030:9727" ph="..." />
-            <marker date="1541471955478" expanded="true" signature="9787:15181" ph="..." />
+            <marker date="1541473496068" expanded="true" signature="8052:8053" ph="..." />
+            <marker date="1541473496068" expanded="true" signature="8052:9970" ph="..." />
+            <marker date="1541473496068" expanded="true" signature="10026:11482" ph="..." />
           </folding>
         </state>
       </provider>

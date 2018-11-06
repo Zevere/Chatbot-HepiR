@@ -7,9 +7,9 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.4.2"
+VERSION = "3.4.3"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
-KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>')
+KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/caps <insert text>')
 
 LOCAL_ENV = False
 
@@ -57,7 +57,7 @@ def index():
 def login_widget():
     auth_date = request.args.get('auth_date')
     first_name = request.args.get('first_name')
-    tg_id = request.args.get('id')
+    tg_id = str(request.args.get('id'))
     zv_user = request.args.get('zv-user')
     widget_hash = request.args.get('hash')
 
@@ -214,109 +214,39 @@ def get_profile(msg):
                          'You are not logged into Zevere. Please login at https://zv-s-webapp-coherent.herokuapp.com/ and use the Login Widget provided on the Profile page after logging in :)!')
 
 
-# @bot.message_handler(commands=['login'])
-# def login(msg):
-#     log_command_info('/login', msg)
-#
-#     # TODO: Send message with link which tells user to login to Coherent and then go to /profile and click on login widget
-#     # if logged in, simply let them know who they are logged in as. and provide friendly message
-#
-#     zv_user = 'kevin.ma'
-#     tg_id = '289934826'
-#     first_name = 'Kevin'
-# # check if zv_user already exists; duplicate users results in 503 error from VIVID API
-# should_connect_hepir = False
-# vivid_request = requests.get('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations/{}'.format(zv_user),
-#                              auth=(VIVID_USER, VIVID_PASSWORD))
-#
-# print(
-#     '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
-#                                                                          vivid_request.request,
-#                                                                          vivid_request.url,
-#                                                                          vivid_request.status_code))
-#
-# # status_code == 200
-# # USE CASE 1: zv_user registered in Zevere and connected with Calista but NOT HepiR
-# if vivid_request.status_code == 200:
-#     print('[{}] User registration found for ({})'.format(str(datetime.datetime.now()).split('.')[0], zv_user))
-#     pprint(vivid_request.json())
-#     should_connect_hepir = True
-#
-# # status_code == 400
-# # USE CASE 2: zv_user is not registered in Zevere
-# elif vivid_request.status_code == 400:
-#     print('[{}] User ID ({}) is invalid or does not exist'.format(str(datetime.datetime.now()).split('.')[0],
-#                                                                   zv_user))
-#     pprint(vivid_request.json())
-#     # should never get here because can only access Login Widget workflow on Profile page after logging in via Coherent
-#
-# # status_code == 404
-# # USE CASE 3: zv_user is registered but not connected to Calista or HepiR
-# elif vivid_request.status_code == 404:
-#     print('[{}] User ({}) has not registered with any of the Zevere chat bots'.format(
-#         str(datetime.datetime.now()).split('.')[0], zv_user))
-#     pprint(vivid_request.json())
-#     should_connect_hepir = True
-#
-# # connect zv_user to tg_id if not exists in hepir db
-# # send post with {
-# #   "username": "string",
-# #   "chatUserId": "string"
-# # }
-# # as payload to vivid api
-# if should_connect_hepir:
-#     # if user connection already in hepir db, don't add again
-#     if user_collection.find_one({
-#         'zv_user': zv_user,
-#         'tg_id': tg_id
-#     }):
-#         print('[{}] (zv_user={}, tg_id={}) found in (db={}) => {} is a returning user :)!'.format(
-#             str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME, first_name))
-#         print('[{}] will not be adding (zv_user={}, tg_id={}) to (db={})'.format(
-#             str(datetime.datetime.now()).split('.')[0], zv_user,
-#             tg_id, MONGODB_DBNAME))
-#
-#     # zv user - tg user connection not found in hepir db => add connection to hepir db
-#     else:
-#         print(
-#             '[{}] No users found matching (zv_user={}, tg_id={}) in (db={})'.format(
-#                 str(datetime.datetime.now()).split('.')[0],
-#                 zv_user, tg_id, MONGODB_DBNAME))
-#         print('[{}] adding (zv_user={}, tg_id={}) to (db={})...'.format(str(datetime.datetime.now()).split('.')[0],
-#                                                                         zv_user, tg_id, MONGODB_DBNAME))
-#         new_user_id = user_collection.insert_one({
-#             'zv_user': zv_user,
-#             'tg_id': tg_id
-#         }).inserted_id
-#         print('[{}] new user (zv_user={}, tg_id={}) inserted into (db={}): (inserted_id={})'.format(
-#             str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME,
-#             new_user_id))
-#
-#         # send post request to vivid api with payload containing zv user and tg user id
-#         vivid_request = requests.post('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations',
-#                                       json={"username": zv_user, "chatUserId": tg_id},
-#                                       auth=(VIVID_USER, VIVID_PASSWORD))
-#
-#         print('vivid_request is: {}'.format(vivid_request))
-#         print('[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(
-#             str(datetime.datetime.now()).split('.')[0],
-#             vivid_request.request,
-#             vivid_request.url,
-#             vivid_request.status_code))
-#         print('[{}] The json of the vivid_request ([{}]: {}) is: {}'.format(
-#             str(datetime.datetime.now()).split('.')[0],
-#             vivid_request.request,
-#             vivid_request.url,
-#             vivid_request.json()))
-#
-#         if vivid_request.status_code == 201:
-#             print(
-#                 '[{}] Zevere User (zv_user={}) has been succesfully connected to telegram account (tg_id={})'.format(
-#                     str(datetime.datetime.now()).split('.')[0], zv_user, tg_id))
-#         elif vivid_request.status_code == 400:
-#             print(
-#                 '[{}] There are invalid fields in the POST request to VIVID API or the username (zv_user={}) does not exist on Zevere'.format(
-#                     str(datetime.datetime.now()).split('.')[0], zv_user))
+# If logged in, HepiR sends friendly welcome message and tells tg user who they are logged in as (zv_user)
+# Else, provides redirect link to user to login to Coherent and tells them to click on login widget under profile
+@bot.message_handler(commands=['login'])
+def login(msg):
+    log_command_info('/login', msg)
+
+    # my tg id
+    tg_id = msg.chat.id
+
+    # get zv_user of the connected account from the hepir db
+    found_connection = user_collection.find_one({'tg_id': str(tg_id)})
+
+    if found_connection:
+        zv_user = found_connection.get('zv_user')
+
+        # query vivid to get zevere profile associated with connected zv_user
+        #     e.g. GET https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/?username=kevin.ma
+        vivid_request = requests.get(
+            'https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/', params={'username': zv_user},
+            auth=(VIVID_USER, VIVID_PASSWORD))
+
+        bot.send_message(msg.chat.id,
+                         'You are  currently logged into Zevere as {}\nWelcome, {} :)'.format(zv_user,
+                                                                                           msg.from_user.first_name))
+
+    # zv user - tg user connection not found in hepir db => add connection to hepir db
+    else:
+        print(
+            '[{}] No connections found matching (tg_id={}) in (db={})'.format(
+                str(datetime.datetime.now()).split('.')[0], tg_id, MONGODB_DBNAME))
+
+        bot.send_message(msg.chat.id,
+                         'You are not logged into Zevere. Please login at https://zv-s-webapp-coherent.herokuapp.com/ and use the Login Widget provided on the Profile page after logging in :)!')
 
 
 @bot.message_handler(commands=['start'])
