@@ -7,11 +7,11 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.4.1"
+VERSION = "3.4.2"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>')
 
-LOCAL_ENV = True
+LOCAL_ENV = False
 
 if LOCAL_ENV:
     from src.dev_env import *
