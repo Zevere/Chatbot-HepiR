@@ -11,7 +11,7 @@ VERSION = "3.4.1"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
 KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>')
 
-LOCAL_ENV = False
+LOCAL_ENV = True
 
 if LOCAL_ENV:
     from src.dev_env import *
@@ -20,7 +20,6 @@ else:
 
     # picked up from heroku configs
     TOKEN = os.environ['TOKEN']
-    PORT = int(os.environ['PORT'])
     MONGODB_URI = os.environ['MONGODB_URI']
     BOT_USERNAME = os.environ['BOT_USERNAME']
     VIVID_USER = os.environ['VIVID_USER']
@@ -178,10 +177,8 @@ def get_profile(msg):
     # my tg id
     tg_id = msg.chat.id
 
-    print('tg_id is {}'.format(tg_id))
-
     # get zv_user of the connected account from the hepir db
-    found_connection = user_collection.find_one({'tg_id': tg_id})
+    found_connection = user_collection.find_one({'tg_id': str(tg_id)})
 
     if found_connection:
         zv_user = found_connection.get('zv_user')
@@ -418,4 +415,4 @@ def log_received_text_msg(txt, msg):
 
 if __name__ == "__main__":
     init()
-    app.run(host='0.0.0.0', port=PORT)
+    app.run(host='0.0.0.0')
