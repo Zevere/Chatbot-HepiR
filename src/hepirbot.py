@@ -201,8 +201,8 @@ def get_profile(msg):
         pprint(resp)
 
         bot.send_message(msg.chat.id,
-                         'You are logged into Zevere as {}\n---\nProfile\n---\nZevere Id: {}\nFirst Name: {}\nLast Name: {}\n Joined At: {}'.format(
-                             zv_user, zv_user, fname, lname, joined_at))
+                         'You are logged into Zevere as `{}`\n---\nProfile\n---\nZevere Id: `{}`\nFirst Name: {}\nLast Name: {}\n Joined At: {}'.format(
+                             zv_user, zv_user, fname, lname, joined_at), parse_mode="Markdown")
 
     # zv user - tg user connection not found in hepir db => add connection to hepir db
     else:
@@ -236,8 +236,9 @@ def login(msg):
             auth=(VIVID_USER, VIVID_PASSWORD))
 
         bot.send_message(msg.chat.id,
-                         'You are  currently logged into Zevere as {}\nWelcome, {} :)'.format(zv_user,
-                                                                                           msg.from_user.first_name))
+                         'You are  currently logged into Zevere as `{}`\nWelcome, {} :)'.format(zv_user,
+                                                                                                msg.from_user.first_name),
+                         parse_mode="Markdown")
 
     # zv user - tg user connection not found in hepir db => add connection to hepir db
     else:
