@@ -7,9 +7,9 @@ from pymongo import MongoClient
 from pprint import pprint
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.3.2"
+VERSION = "3.4.1"
 UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
-KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>', '/weather')
+KNOWN_COMMANDS = ('/start', '/about', '/caps <insert text>')
 
 LOCAL_ENV = False
 
@@ -22,11 +22,14 @@ else:
     TOKEN = os.environ['TOKEN']
     PORT = int(os.environ['PORT'])
     MONGODB_URI = os.environ['MONGODB_URI']
-    MONGODB_DBNAME = os.environ['MONGODB_DBNAME']
-    MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
     BOT_USERNAME = os.environ['BOT_USERNAME']
     VIVID_USER = os.environ['VIVID_USER']
     VIVID_PASSWORD = os.environ['VIVID_PASSWORD']
+
+# hardcoded constants because we decided not to use heroku environment variables for these things
+MONGODB_COLLECTION = 'users'
+# last element at end of URI
+MONGODB_DBNAME = MONGODB_URI.split('/')[-1]
 
 client = MongoClient(MONGODB_URI)
 db = client[MONGODB_DBNAME]
@@ -156,7 +159,7 @@ def login_widget():
 
     # sends feedback to user confirming login
     requests.get(
-        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged in as {}!'.format(
+        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=You have been logged in to Zevere as {}!'.format(
             TOKEN, tg_id, zv_user))
 
     return redirect('https://t.me/{}'.format(BOT_USERNAME))
@@ -168,9 +171,49 @@ def get_webhook_info():
 
 
 # Telegram Bot Command Handlers --------------------------------------------------------------------------
-# @bot.message_handler(commands=['me'])
-# def get_profile(msg):
-#     log_command_info('/me', msg)
+@bot.message_handler(commands=['me'])
+def get_profile(msg):
+    log_command_info('/me', msg)
+
+    # my tg id
+    tg_id = msg.chat.id
+
+    print('tg_id is {}'.format(tg_id))
+
+    # get zv_user of the connected account from the hepir db
+    found_connection = user_collection.find_one({'tg_id': tg_id})
+
+    if found_connection:
+        zv_user = found_connection.get('zv_user')
+
+        # query vivid to get zevere profile associated with connected zv_user
+        #     e.g. GET https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/?username=kevin.ma
+        vivid_request = requests.get(
+            'https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/', params={'username': zv_user},
+            auth=(VIVID_USER, VIVID_PASSWORD))
+
+        resp = vivid_request.json()
+
+        fname = resp.get('firstName')
+        zv_user = resp.get('id')
+        joined_at = resp.get('joinedAt')
+        lname = resp.get('lastName')
+
+        print('found this resp:')
+        pprint(resp)
+
+        bot.send_message(msg.chat.id,
+                         'You are logged into Zevere as {}\n---\nProfile\n---\nZevere Id: {}\nFirst Name: {}\nLast Name: {}\n Joined At: {}'.format(
+                             zv_user, zv_user, fname, lname, joined_at))
+
+    # zv user - tg user connection not found in hepir db => add connection to hepir db
+    else:
+        print(
+            '[{}] No connections found matching (tg_id={}) in (db={})'.format(
+                str(datetime.datetime.now()).split('.')[0], tg_id, MONGODB_DBNAME))
+
+        bot.send_message(msg.chat.id,
+                         'You are not logged into Zevere. Please login at https://zv-s-webapp-coherent.herokuapp.com/ and use the Login Widget provided on the Profile page after logging in :)!')
 
 
 # @bot.message_handler(commands=['login'])
@@ -315,6 +358,7 @@ def query_text(inline_query):
         bot.answer_inline_query(inline_query.id, [r])
     except Exception as e:
         print(e)
+
 
 @bot.message_handler(content_types=['text'])
 def echo_message(msg):
