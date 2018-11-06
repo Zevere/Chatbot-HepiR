@@ -19,6 +19,7 @@ else:
     WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
 
     # picked up from heroku configs
+    PORT = int(os.environ['PORT'])
     TOKEN = os.environ['TOKEN']
     MONGODB_URI = os.environ['MONGODB_URI']
     BOT_USERNAME = os.environ['BOT_USERNAME']
@@ -415,4 +416,4 @@ def log_received_text_msg(txt, msg):
 
 if __name__ == "__main__":
     init()
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=PORT)
