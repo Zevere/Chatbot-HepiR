@@ -1,42 +1,11 @@
-import os
-import requests
 import datetime
-import telebot
-from flask import Flask, request, redirect
-from pymongo import MongoClient
 from pprint import pprint
+import requests
+from flask import request, redirect
+import src.markup as m
 
 # VARS ----------------------------------------------------------------------------------------------------
-VERSION = "3.5.0"
-UNDERSTANDABLE_LANGUAGE = ('hello', 'bonjour', 'hi', 'greetings', 'sup')
-KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/caps <insert text>')
-
-LOCAL_ENV = False
-
-if LOCAL_ENV:
-    from src.dev_env import *
-else:
-    WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
-
-    # picked up from heroku configs
-    PORT = int(os.environ['PORT'])
-    TOKEN = os.environ['TOKEN']
-    MONGODB_URI = os.environ['MONGODB_URI']
-    BOT_USERNAME = os.environ['BOT_USERNAME']
-    VIVID_USER = os.environ['VIVID_USER']
-    VIVID_PASSWORD = os.environ['VIVID_PASSWORD']
-
-# hardcoded constants because we decided not to use heroku environment variables for these things
-MONGODB_COLLECTION = 'users'
-# last element at end of URI
-MONGODB_DBNAME = MONGODB_URI.split('/')[-1]
-
-client = MongoClient(MONGODB_URI)
-db = client[MONGODB_DBNAME]
-user_collection = db[MONGODB_COLLECTION]
-
-bot = telebot.TeleBot(TOKEN)
-app = Flask(__name__)
+from src.properties import *
 
 
 # Flask Routes ------------------------------------------------------------------------------------------
@@ -199,6 +168,18 @@ def get_webhook_info():
 
 
 # Telegram Bot Command Handlers --------------------------------------------------------------------------
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    if call.data == "cb_yes":
+        bot.answer_callback_query(call.id, "Answer is Yes")
+    elif call.data == "cb_no":
+        bot.answer_callback_query(call.id, "Answer is No")
+
+
+@bot.message_handler(commands=['q'])
+def message_handler(message):
+    bot.send_message(message.chat.id, "Yes/no?", reply_markup=m.gen_markup())
+
 
 # no args /lists displays lists owned by connected zv account user
 # args with /lists "selects" the list if the listname in args exists and is owned by the connected zv account user
