@@ -12,4 +12,3 @@ if (process.env['TRAVIS'] && process.env['CI']) {
     console.warn = m => console.log(chalk.yellow.bold(m))
     console.error = m => console.log(chalk.red.bold(m))
 }
-// asdfsadfsf
