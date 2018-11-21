@@ -3,10 +3,10 @@ import telebot
 from flask import Flask
 from pymongo import MongoClient
 
-VERSION = "3.5.1"
+VERSION = "3.5.2"
 KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/lists', '/caps <insert text>')
 
-LOCAL_ENV = True
+LOCAL_ENV = False
 
 if LOCAL_ENV:
     from src.dev_env import *
