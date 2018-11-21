@@ -13,7 +13,7 @@ module.exports.build_image = function () {
     $.cp(`${root}/scripts/build/Heroku.Dockerfile`, `${root}/dist/Dockerfile`)
 
     console.debug('copying source scripts')
-    $.cp('-R', `${root}/src/*`, `${root}/dist/app`)
+    $.cp('-R', `${root}/src/*`, `${root}/dist/app/src`)
 
     console.debug('building docker image')
     $.exec(`docker build -t ${image_name} ${root}/dist/`)
