@@ -1,4 +1,4 @@
-from . markup import * as m
+from . markup import *
 
 # Flask Routes ------------------------------------------------------------------------------------------
 from . flask_routes import *
@@ -34,7 +34,7 @@ def list_management(msg):
     bot.send_message(msg.chat.id,
                      "------------------------------\n*List Management*\n------------------------------\nWelcome to the List Management Screen!\n\nHere you are able to create new lists, view all of your lists, delete and existing list, and select a list to view its list items and/or add new tasks to the list.\n\nWhat would you like to do on this blessed day ٩(⁎❛ᴗ❛⁎)۶?",
                      parse_mode="Markdown",
-                     reply_markup=m.list_management_markup())
+                     reply_markup=list_management_markup())
     return
 
 
