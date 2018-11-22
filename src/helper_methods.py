@@ -1,5 +1,5 @@
 import requests
-from properties import *
+from src.properties import *
 import datetime
 
 

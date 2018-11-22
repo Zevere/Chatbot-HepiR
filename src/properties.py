@@ -6,7 +6,7 @@ from pymongo import MongoClient
 VERSION = "3.5.2"
 KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/lists', '/caps <insert text>')
 
-LOCAL_ENV = False
+LOCAL_ENV = True
 
 if LOCAL_ENV:
     from src.dev_env import *

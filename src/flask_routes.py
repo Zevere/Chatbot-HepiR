@@ -2,7 +2,7 @@ from pprint import pprint
 import datetime
 import requests
 from flask import request, redirect
-from properties import *
+from src.properties import *
 
 
 # webhook will send update to the bot, so need to process update messages received

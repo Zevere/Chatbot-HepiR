@@ -1,10 +1,10 @@
 FROM python:3-alpine
 
 WORKDIR /app
-COPY src .
+COPY src ./src
 RUN pip3 install -r requirements.txt
 
 EXPOSE 80
 ENV PORT=80
 
-CMD ["python3", "hepirbot.py"]
+CMD ["python3", "src/hepirbot.py"]
