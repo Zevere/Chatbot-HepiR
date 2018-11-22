@@ -9,7 +9,7 @@ KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/lists', '/caps <insert 
 LOCAL_ENV = False
 
 if LOCAL_ENV:
-    from . dev_env import *
+    from dev_env import *
 else:
     WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
 

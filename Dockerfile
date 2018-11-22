@@ -7,4 +7,4 @@ RUN pip3 install -r requirements.txt
 EXPOSE 80
 ENV PORT=80
 
-CMD ["python3", "hepirbot.py"]
+CMD ["python3", "__main__.py"]

@@ -1,10 +1,10 @@
-from . markup import *
+from markup import *
 
 # Flask Routes ------------------------------------------------------------------------------------------
-from . flask_routes import *
+from flask_routes import *
 
 # Helper methods ------------------------------------------------------------------------------------------
-from . helper_methods import *
+from helper_methods import *
 
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------

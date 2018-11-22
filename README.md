@@ -13,7 +13,14 @@ cd scripts && npm i && cd .. && node scripts/build
 ## to run the image to start up the bot
 
 ```sh
-docker run -it -e TOKEN=<BOT_TOKEN> -e OPENWEATHER_TOKEN=<OpenWeather TOKEN> -e PORT=<port for flask app to run on> chatbot-hepir
+docker run -it \
+	-e MONGODB_URI=<URI>	\
+	-e TOKEN=<BOT_TOKEN> \
+	-e PORT=<port for flask app to run on> \
+	-e BOT_USERNAME=<BOT_USERNAME>	\
+	-e VIVID_USER=<VIVID_USER>	\
+	-e VIVID_PASSWORD=<VIVID_PASSWORD>	\
+	chatbot-hepir
 ```
 
 ## heroku cli commands used
@@ -23,7 +30,7 @@ heroku login
 heroku create <app name>
 git push heroku master
 heroku ps:scale (web|worker)=(0|1)
-heroku logs
+heroku logs --tail
 ```
 
 ## credits
