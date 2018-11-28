@@ -1,4 +1,3 @@
-dist: trusty
 sudo: required
 language: node_js
 node_js:
@@ -11,17 +10,13 @@ notifications:
 services:
   - docker
 install:
-  - cd scripts && npm install && cd ..
+  - cd scripts && npm ci && cd ..
 
 script:
-  - node scripts/build && node scripts/test
+  - node scripts/build
+  - node scripts/test
 
 deploy:
-  - provider: script
-    skip_cleanup: true
-    script: node scripts/deploy Staging
-    on:
-      branch: develop
   - provider: script
     skip_cleanup: true
     script: node scripts/deploy Production
@@ -29,24 +24,11 @@ deploy:
       branch: master
 
 env:
-  # DEPLOY_SETTINGS_JSON='{"Staging":[ /* ... */ ]}'
-  - secure: YtojCArnLeUD75G1BhfW3E8FwwvUZlETZH6qFYkZ//3f4Tv7xsRwriLYfOIYbalwWWZEhsjoKk8a5pZcxzEdfllx9fOdCI9EOg3CjgAhdLeUJdkcCNK2sPoWtMMVs4yEmdq6ZVEhvTDZ0uk7V6/mBCttdMl2u5cPMg9P16Tr7pfrssoPfZ2bQSWtCS4cPRT2YDLFjmtkpSunKAcmlCCYOn2lRpC8fDcBUYpv9hld1T8XDsOjsZL9vmb0zNgfB6Rx9W+cJ+3+mhs7qUbS8jui03QP74f1yh4Tb2J1WTTUIIhGeN7PR1CDA/dltOhN986pSQ6Q76lPaKzukLGUX8DENnIEZaoJOeFUcfBPc9eIi1bb1wRCuiCzOa7QzGr3pzDR/I6aWq4HCS1//EdC6Ay/24ZWQeO/z4WSKAPO96thPP71StysFc7ZWpw4mCXzcdE6Jl+gsYu/+xD56Iho1+tE51yTKlsTWocG/1xVmA0GPEOPpGhsm7KAG7WNbP+rFnjiQODON0U8doMKp2DDv1G4L19S8kj6NzmnxRkMUUYNMTnh+j/K3UFSmQ1eJawbWasSd7Qy5pbBMCWKpkGsMU9pYdp/XQHJFmNfx5slxYBL3bKFFKvxYiNxsC6WJbl6rLj//WTT7NGbV01sPcSaucrtsbB/XJBllsSkPXwnC+e1CNM=
+  # DEPLOY_SETTINGS_JSON='{"Production":[
+  #   {"type":"docker","options":{"source":"chatbot-hepir","target":"zevere/chatbot-hepir","user":"","pass":""}},
+  #   {"type":"heroku","options":{"app":"zv-chatbot-hepir","source":"zevere/chatbot-hepir","dyno":"web","user":"","token":""}}
+  # ]}'
+  - secure: CsolFH1aiK/yrkSwXzpk0IgRmZf3rpd9nyxqKU5qUL7PD059gkjnd3GszKy13t8OwqdxUi0p05wbSwITpHCUPgeDRNyUiEgTVx1DtlGDMS38AHz5ZesrCv9Xdxv0/P25XFRf4qS6np/2LeGbooBhEhhiue2A5CaZ0NZl4VhSRckhxCLwdEcQYJkxYyaLDouiroQhzPShEbP/ZpgA93FPLl1xrvwLwnMPm6OhpmFVSfKE2VmDK/dCmvaxU+VTNpVa+tYU+eaq5gMv6Xb1Spf9+vsVw9Uc0p7mEWm2+1oidykVDkmxOcaSdbmRei6AdemIHEJCPmWutMWy+zudD8I/bOWT8yBA4r2pLVROj/W9y5uTVH6htYMcqiVIq8coXALtQvn+dzzddKJdqVyqHSqNPjEkI6/cbfOUak9fa8fx3PNXWsP7uhHWDaYN54oUIPIYtamcXJjDs91DhPOMOCMaIp1MB2LzFqPhf7bxI5ZuMLiFgc9vGhfH6gY00XvfxSnHzkCr1/z02LiS4aGGRNIX69HTJ8tX5vAPWvAxyNrIFfPc+LNOIsPuoxKzmo+VwCToEohI5oG/yj9qaasgTqWcuRl6tQuzJmDRhrdCnPvLg5Nq7lBRnSNzkUg64FwzT1VAY6+dNrYjmUtnYZFQ2EJNNMej3ROqPhRqUILzcDXhdmQ=
 
 
 # Disable "Build pushed pull requests"
-
-# env:
-#   DEPLOY_SETTINGS_JSON: A mapping of environment to the deployment types and their options.
-#   {
-#     "Staging": [
-#       { "type": "docker",
-#         "options": { "source": "foo:edge", "target": "foo/bar:latest", "user": "foo", "pass": "PASS" } 
-#       },
-#       { "type": "heroku", 
-#         "options": { 
-#           "app": "foo-staging", "source": "foo:latest", "dyno": "web", "user": "foo@example.org", "token": "TOKEN" 
-#         }
-#       }
-#     ],
-#     "Production": [ ]
-#   }
