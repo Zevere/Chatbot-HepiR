@@ -28,9 +28,12 @@ deploy:
     on:
       branch: master
 
+env:
+  # DEPLOY_SETTINGS_JSON='{"Staging":[ /* ... */ ]}'
+  - secure: YtojCArnLeUD75G1BhfW3E8FwwvUZlETZH6qFYkZ//3f4Tv7xsRwriLYfOIYbalwWWZEhsjoKk8a5pZcxzEdfllx9fOdCI9EOg3CjgAhdLeUJdkcCNK2sPoWtMMVs4yEmdq6ZVEhvTDZ0uk7V6/mBCttdMl2u5cPMg9P16Tr7pfrssoPfZ2bQSWtCS4cPRT2YDLFjmtkpSunKAcmlCCYOn2lRpC8fDcBUYpv9hld1T8XDsOjsZL9vmb0zNgfB6Rx9W+cJ+3+mhs7qUbS8jui03QP74f1yh4Tb2J1WTTUIIhGeN7PR1CDA/dltOhN986pSQ6Q76lPaKzukLGUX8DENnIEZaoJOeFUcfBPc9eIi1bb1wRCuiCzOa7QzGr3pzDR/I6aWq4HCS1//EdC6Ay/24ZWQeO/z4WSKAPO96thPP71StysFc7ZWpw4mCXzcdE6Jl+gsYu/+xD56Iho1+tE51yTKlsTWocG/1xVmA0GPEOPpGhsm7KAG7WNbP+rFnjiQODON0U8doMKp2DDv1G4L19S8kj6NzmnxRkMUUYNMTnh+j/K3UFSmQ1eJawbWasSd7Qy5pbBMCWKpkGsMU9pYdp/XQHJFmNfx5slxYBL3bKFFKvxYiNxsC6WJbl6rLj//WTT7NGbV01sPcSaucrtsbB/XJBllsSkPXwnC+e1CNM=
+
 
 # Disable "Build pushed pull requests"
-
 
 # env:
 #   DEPLOY_SETTINGS_JSON: A mapping of environment to the deployment types and their options.

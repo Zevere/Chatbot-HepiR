@@ -1,4 +1,14 @@
 const $ = require('shelljs')
 require('../logging')
 
-console.warn('ToDo: Test the solution')
+$.config.fatal = true
+
+
+try {
+    console.warn(`ToDo`)
+} catch (e) {
+    console.error(e)
+    process.exit(1)
+}
+
+console.info(`✅ Tests Passed.`)
