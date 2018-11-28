@@ -125,3 +125,5 @@ webhook_pkey.pem
 # dev env
 secret_stuff
 dev_env*
+
+.idea/

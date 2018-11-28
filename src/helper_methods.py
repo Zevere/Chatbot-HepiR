@@ -20,9 +20,8 @@ def show_lists(msg):
     print("zv_user={}".format(zv_user))
 
     # send POST request to borzoo graphql web api to query lists belonging to connected zv user
-    response = requests.post('https://zv-s-webapi-borzoo.herokuapp.com/zv/graphql',
-                             json=
-                             {
+    response = requests.post('https://zv-webapi-borzoo.herokuapp.com//zv/graphql',
+                             json={
                                  "query": "query{ user(userId:\"" + zv_user + "\") { lists { id collaborators createdAt description owner tags tasks { id } title updatedAt } } }"
                              },
                              headers={'Content-Type': 'application/json'})
@@ -36,7 +35,8 @@ def show_lists(msg):
         list_count = 0
 
         for list in owned_lists:
-            list_output_string += "Title: {}\nDescription: {}\n\n".format(list['title'], list['description'])
+            list_output_string += "Title: {}\nDescription: {}\n\n".format(
+                list['title'], list['description'])
             list_count += 1
 
         if 'ican put fake id here that alrady exists? suka blyat' in list_output_string:

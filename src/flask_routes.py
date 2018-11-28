@@ -8,7 +8,8 @@ from properties import *
 # webhook will send update to the bot, so need to process update messages received
 @app.route('/' + TOKEN, methods=['POST'])
 def get_message():
-    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode('utf-8'))])
+    bot.process_new_updates(
+        [telebot.types.Update.de_json(request.stream.read().decode('utf-8'))])
     return "", 200
 
 
@@ -30,7 +31,7 @@ def login_widget():
 
     # check if zv_user already exists; duplicate users results in 503 error from VIVID API
     should_connect_hepir = False
-    vivid_request = requests.get('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations/{}'.format(zv_user),
+    vivid_request = requests.get('https://zv-botops-vivid.herokuapp.com//api/v1/user-registrations/{}'.format(zv_user),
                                  auth=(VIVID_USER, VIVID_PASSWORD))
 
     print(
@@ -42,7 +43,8 @@ def login_widget():
     # status_code == 200
     # USE CASE 1: zv_user registered in Zevere and connected with Calista but NOT HepiR
     if vivid_request.status_code == 200:
-        print('[{}] User registration found for ({})'.format(str(datetime.datetime.now()).split('.')[0], zv_user))
+        print('[{}] User registration found for ({})'.format(
+            str(datetime.datetime.now()).split('.')[0], zv_user))
         pprint(vivid_request.json())
         should_connect_hepir = True
 
@@ -113,12 +115,14 @@ def login_widget():
                 'tg_id': tg_id
             }).inserted_id
             print('[{}] new user (zv_user={}, tg_id={}) inserted into (db={}): (inserted_id={})'.format(
-                str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME,
+                str(datetime.datetime.now()).split('.')[
+                    0], zv_user, tg_id, MONGODB_DBNAME,
                 new_user_id))
 
             # send post request to vivid api with payload containing zv user and tg user id
-            vivid_request = requests.post('https://zv-s-botops-vivid.herokuapp.com/api/v1/user-registrations',
-                                          json={"username": zv_user, "chatUserId": tg_id},
+            vivid_request = requests.post('https://zv-botops-vivid.herokuapp.com//api/v1/user-registrations',
+                                          json={"username": zv_user,
+                                                "chatUserId": tg_id},
                                           auth=(VIVID_USER, VIVID_PASSWORD))
 
             print('vivid_request is: {}'.format(vivid_request))

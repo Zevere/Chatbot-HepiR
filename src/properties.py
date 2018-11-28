@@ -3,15 +3,16 @@ import telebot
 from flask import Flask
 from pymongo import MongoClient
 
-VERSION = "3.5.3"
-KNOWN_COMMANDS = ('/start', '/about', '/login', '/me', '/lists', '/caps <insert text>')
+VERSION = "3.5.4"
+KNOWN_COMMANDS = ('/start', '/about', '/login', '/me',
+                  '/lists', '/caps <insert text>')
 
 LOCAL_ENV = False
 
 if LOCAL_ENV:
     from dev_env import *
 else:
-    WEBHOOK_URL = 'https://zv-s-chatbot-hepir.herokuapp.com/'
+    WEBHOOK_URL = 'https://zv-chatbot-hepir.herokuapp.com/'
 
     # picked up from heroku configs
     PORT = int(os.environ['PORT'])

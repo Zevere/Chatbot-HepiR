@@ -52,9 +52,9 @@ def get_profile(msg):
         zv_user = found_connection.get('zv_user')
 
         # query vivid to get zevere profile associated with connected zv_user
-        #     e.g. GET https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/?username=kevin.ma
+        #     e.g. GET https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/?username=kevin.ma
         vivid_request = requests.get(
-            'https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/', params={'username': zv_user},
+            'https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/', params={'username': zv_user},
             auth=(VIVID_USER, VIVID_PASSWORD))
 
         resp = vivid_request.json()
@@ -100,9 +100,9 @@ def login(msg):
         zv_user = found_connection.get('zv_user')
 
         # query vivid to get zevere profile associated with connected zv_user
-        #     e.g. GET https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/?username=kevin.ma
+        #     e.g. GET https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/?username=kevin.ma
         vivid_request = requests.get(
-            'https://zv-s-botops-vivid.herokuapp.com/api/v1/operations/getUserProfile/', params={'username': zv_user},
+            'https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/', params={'username': zv_user},
             auth=(VIVID_USER, VIVID_PASSWORD))
 
         bot.send_message(msg.chat.id,
@@ -165,7 +165,8 @@ def echo_message(msg):
     log_received_text_msg(msg.text, msg)
     # first char, text starts with /, unknown command
     if msg.text[0] == '/':
-        bot.reply_to(msg, 'Sorry, I did not understand the command: {}'.format(msg.text))
+        bot.reply_to(
+            msg, 'Sorry, I did not understand the command: {}'.format(msg.text))
     else:
         bot.reply_to(msg, msg.text)
 
