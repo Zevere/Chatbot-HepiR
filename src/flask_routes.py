@@ -15,10 +15,10 @@ def get_message():
 
 @app.route('/', methods=['GET'])
 def index():
-    return "Come check me out at https://t.me/ZevereBot!", 200
+    return "Come check me out at {}/{}!".format(TG_USERNAME_URL, BOT_USERNAME), 200
 
 
-# https://zv-s-chatbot-hepir.herokuapp.com/api/login-widget?zv-user=ZV_USER&id=TELEGRAM_USERID&first_name=TELEGRAM_FIRST_NAME&auth_date=CURR_EPOCH_TIME&hash=HASH
+# WEBHOOK_URL/api/login-widget?zv-user=ZV_USER&id=TELEGRAM_USERID&first_name=TELEGRAM_FIRST_NAME&auth_date=CURR_EPOCH_TIME&hash=HASH
 @app.route('/api/login-widget', methods=['GET'])
 def login_widget():
     auth_date = request.args.get('auth_date')
@@ -31,7 +31,7 @@ def login_widget():
 
     # check if zv_user already exists; duplicate users results in 503 error from VIVID API
     should_connect_hepir = False
-    vivid_request = requests.get('https://zv-botops-vivid.herokuapp.com//api/v1/user-registrations/{}'.format(zv_user),
+    vivid_request = requests.get('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
                                  auth=(VIVID_USER, VIVID_PASSWORD))
 
     print(
@@ -120,7 +120,7 @@ def login_widget():
                 new_user_id))
 
             # send post request to vivid api with payload containing zv user and tg user id
-            vivid_request = requests.post('https://zv-botops-vivid.herokuapp.com//api/v1/user-registrations',
+            vivid_request = requests.post('{}/api/v1/user-registrations'.format(VIVID_ROOT_URL),
                                           json={"username": zv_user,
                                                 "chatUserId": tg_id},
                                           auth=(VIVID_USER, VIVID_PASSWORD))
@@ -159,7 +159,7 @@ def login_widget():
             'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Zevere User ID `{}` is invalid or does not exist!&parse_mode=Markdown'.format(
                 TOKEN, tg_id, zv_user))
 
-    return redirect('https://t.me/{}'.format(BOT_USERNAME))
+    return redirect('{}/{}'.format(TG_USERNAME_URL, BOT_USERNAME))
 
 
 @app.route('/getWebhookInfo')

@@ -52,9 +52,9 @@ def get_profile(msg):
         zv_user = found_connection.get('zv_user')
 
         # query vivid to get zevere profile associated with connected zv_user
-        #     e.g. GET https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/?username=kevin.ma
+        #     e.g. GET VIVID_ROOT_URL/api/v1/operations/getUserProfile/?username=kevin.ma
         vivid_request = requests.get(
-            'https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/', params={'username': zv_user},
+            '{}/api/v1/operations/getUserProfile/'.format(VIVID_ROOT_URL), params={'username': zv_user},
             auth=(VIVID_USER, VIVID_PASSWORD))
 
         resp = vivid_request.json()
@@ -81,7 +81,7 @@ def get_profile(msg):
                 str(datetime.datetime.now()).split('.')[0], tg_id, MONGODB_DBNAME))
 
         bot.send_message(msg.chat.id,
-                         'You are not logged into Zevere. Please login at https://zv-s-webapp-coherent.herokuapp.com/ and use the Login Widget provided on the Profile page after logging in :)!')
+                         'You are not logged into Zevere. Please login at {} and use the Login Widget provided on the Profile page after logging in :)!'.format(COHERENT_ROOT_URL))
 
 
 # If logged in, HepiR sends friendly welcome message and tells tg user who they are logged in as (zv_user)
@@ -100,9 +100,9 @@ def login(msg):
         zv_user = found_connection.get('zv_user')
 
         # query vivid to get zevere profile associated with connected zv_user
-        #     e.g. GET https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/?username=kevin.ma
+        #     e.g. GET VIVID_ROOT_URL/api/v1/operations/getUserProfile/?username=kevin.ma
         vivid_request = requests.get(
-            'https://zv-botops-vivid.herokuapp.com//api/v1/operations/getUserProfile/', params={'username': zv_user},
+            '{}/api/v1/operations/getUserProfile/'.format(VIVID_ROOT_URL), params={'username': zv_user},
             auth=(VIVID_USER, VIVID_PASSWORD))
 
         bot.send_message(msg.chat.id,
@@ -118,7 +118,7 @@ def login(msg):
                 str(datetime.datetime.now()).split('.')[0], tg_id, MONGODB_DBNAME))
 
         bot.send_message(msg.chat.id,
-                         'You are not logged into Zevere. Please login at https://zv-s-webapp-coherent.herokuapp.com/ and use the Login Widget provided on the Profile page after logging in :)!')
+                         'You are not logged into Zevere. Please login at {} and use the Login Widget provided on the Profile page after logging in :)!'.format(COHERENT_ROOT_URL))
 
 
 @bot.message_handler(commands=['start'])

@@ -20,11 +20,11 @@ def show_lists(msg):
     print("zv_user={}".format(zv_user))
 
     # send POST request to borzoo graphql web api to query lists belonging to connected zv user
-    response = requests.post('https://zv-webapi-borzoo.herokuapp.com//zv/graphql',
+    response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
                              json={
                                  "query": "query{ user(userId:\"" + zv_user + "\") { lists { id collaborators createdAt description owner tags tasks { id } title updatedAt } } }"
-                             },
-                             headers={'Content-Type': 'application/json'})
+    },
+        headers={'Content-Type': 'application/json'})
 
     if response.status_code == 200:
         response = response.json()
@@ -67,7 +67,7 @@ def init():
         # bot.infinity_polling()
         bot.polling(none_stop=True)
     else:
-        bot.set_webhook(url=WEBHOOK_URL + TOKEN)
+        bot.set_webhook(url=WEBHOOK_URL +'/'+ TOKEN)
 
 
 def log_command_info(cmd, msg):

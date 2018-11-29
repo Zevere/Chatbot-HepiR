@@ -3,7 +3,7 @@ import telebot
 from flask import Flask
 from pymongo import MongoClient
 
-VERSION = "3.5.4"
+VERSION = "3.5.5"
 KNOWN_COMMANDS = ('/start', '/about', '/login', '/me',
                   '/lists', '/caps <insert text>')
 
@@ -12,7 +12,7 @@ LOCAL_ENV = False
 if LOCAL_ENV:
     from dev_env import *
 else:
-    WEBHOOK_URL = 'https://zv-chatbot-hepir.herokuapp.com/'
+    WEBHOOK_URL = 'https://zv-chatbot-hepir.herokuapp.com'
 
     # picked up from heroku configs
     PORT = int(os.environ['PORT'])
@@ -26,6 +26,10 @@ else:
 MONGODB_COLLECTION = 'users'
 # last element at end of URI
 MONGODB_DBNAME = MONGODB_URI.split('/')[-1]
+BORZOO_ROOT_URL = 'https://zv-webapi-borzoo.herokuapp.com'
+VIVID_ROOT_URL = 'https://zv-botops-vivid.herokuapp.com'
+COHERENT_ROOT_URL = 'https://zv-s-webapp-coherent.herokuapp.com'
+TG_USERNAME_URL = 'https://t.me'
 
 client = MongoClient(MONGODB_URI)
 db = client[MONGODB_DBNAME]
