@@ -12,7 +12,6 @@ from helper_methods import *
 def callback_query(call):
     if call.data == "cb_viewLists":
         bot.answer_callback_query(call.id, "Here are your lists \(ᵔᵕᵔ)/")
-        # bot.send_message(call.message.chat.id, "Here are your lists \(ᵔᵕᵔ)/")
         show_lists(call.message)
     elif call.data == "cb_createList":
         bot.answer_callback_query(call.id,

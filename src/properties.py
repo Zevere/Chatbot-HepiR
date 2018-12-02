@@ -3,7 +3,7 @@ import telebot
 from flask import Flask
 from pymongo import MongoClient
 
-VERSION = "3.5.5"
+VERSION = "3.5.6"
 KNOWN_COMMANDS = ('/start', '/about', '/login', '/me',
                   '/lists', '/caps <insert text>')
 
@@ -28,7 +28,7 @@ MONGODB_COLLECTION = 'users'
 MONGODB_DBNAME = MONGODB_URI.split('/')[-1]
 BORZOO_ROOT_URL = 'https://zv-webapi-borzoo.herokuapp.com'
 VIVID_ROOT_URL = 'https://zv-botops-vivid.herokuapp.com'
-COHERENT_ROOT_URL = 'https://zv-s-webapp-coherent.herokuapp.com'
+COHERENT_ROOT_URL = 'https://zevere.herokuapp.com/'
 TG_USERNAME_URL = 'https://t.me'
 
 client = MongoClient(MONGODB_URI)
