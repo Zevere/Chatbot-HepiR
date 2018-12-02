@@ -1,45 +1,35 @@
 const $ = require('shelljs')
-const path = require('path')
 require('../logging')
 
-$.config.verbose = true
-const root = path.join(__dirname, '..', '..')
-
+$.config.fatal = true
 
 try {
-    const image_name = 'chatbot-hepir-tests:latest'
-    console.info(`building Docker Image "${image_name}"`)
-    $.cd(`${root}`)
-    $.exec(`docker build --tag ${image_name} -f ${root}/Dockerfile.tests .`)
-    let pytest_result = $.exec(`docker run --rm ${image_name} pytest`).code
+    console.info(`Running HepiR unit tests`)
+
+    const exec_result = $.exec(
+        `docker run --rm --tty ` +
+        `--env "TOKEN=FOO" ` +
+        `chatbot-hepir:test`
+    )
+
     /**
-        * From pytest documentation:
-        * https://docs.pytest.org/en/latest/usage.html#possible-exit-codes
-        */
-    switch (pytest_result) {
+     * From pytest documentation:
+     * https://docs.pytest.org/en/latest/usage.html#possible-exit-codes
+     */
+    switch (exec_result.code) {
         case 0:
-            console.info('Pytest => All tests were collected and passed successfully')
+            console.debug('Pytest => All tests were collected and passed successfully')
             break;
         case 1:
-            console.error('Pytest => Tests were collected and run but some of the tests failed')
-            process.exit(1)
-            break;
+            throw 'Pytest => Tests were collected and run but some of the tests failed'
         case 2:
-            console.error('Pytest => Test execution was interrupted by the user')
-            process.exit(2)
-            break;
+            throw 'Pytest => Test execution was interrupted by the user'
         case 3:
-            console.error('Pytest => Internal error happened while executing tests')
-            process.exit(3)
-            break;
+            throw 'Pytest => Internal error happened while executing tests'
         case 4:
-            console.error('Pytest => pytest command line usage error')
-            process.exit(4)
-            break;
+            throw 'Pytest => pytest command line usage error'
         case 5:
-            console.error('Pytest => No tests were collected')
-            process.exit(5)
-            break;
+            throw 'Pytest => No tests were collected'
     }
 } catch (e) {
     console.error(e)

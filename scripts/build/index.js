@@ -3,13 +3,18 @@ const path = require('path')
 require('../logging')
 
 $.config.fatal = true
-const root = path.join(__dirname, '..', '..')
+const root = path.resolve(`${__dirname}/../..`)
 
 try {
-    const image_name = 'chatbot-hepir:latest'
-    console.info(`building Docker Image "${image_name}"`)
+    console.info(`building Docker images`)
+
     $.cd(root)
-    $.exec(`docker build --no-cache --tag ${image_name} .`)
+
+    console.debug('building the final image with the "chatbot-hepir:latest" tag')
+    $.exec(`docker build --tag chatbot-hepir --no-cache --target final .`)
+
+    console.debug('building the tests image with the "chatbot-hepir:test" tag')
+    $.exec(`docker build --tag chatbot-hepir:test --no-cache --target test .`)
 } catch (e) {
     console.error(e)
     process.exit(1)
