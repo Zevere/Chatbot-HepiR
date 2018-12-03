@@ -3,4 +3,3 @@ flask
 pprint
 pytelegrambotapi
 requests
-pytest

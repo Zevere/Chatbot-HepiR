@@ -3,7 +3,23 @@ from properties import *
 import datetime
 
 
+def delete_list(zv_user, list_id):
+    # TODO
+    pass
+
+
+def create_list(zv_user, list_title, list_desc):
+    # TODO
+    pass
+
+
 def is_authenticated(zv_user, tg_id):
+    # TODO
+    pass
+
+
+def logout(zv_user, tg_id):
+    # TODO
     pass
 
 

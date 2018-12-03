@@ -1,0 +1,6 @@
+pymongo
+flask
+pprint
+pytelegrambotapi
+requests
+pytest
