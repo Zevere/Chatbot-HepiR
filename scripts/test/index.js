@@ -4,22 +4,12 @@ require('../logging')
 $.config.fatal = true
 
 try {
-
-    /**
-     * BEGINNING Remove this before pushing!
-     */
-    // $.config.verbose = true
-    // console.debug('building the tests image with the "chatbot-hepir:test" tag')
-    // $.exec(`docker build --tag chatbot-hepir:test --target test .`)
-    /**
-     * END Remove this before pushing!
-     */
-
     console.info(`Running HepiR unit tests`)
 
     const exec_result = $.exec(
         `docker run --rm --tty ` +
         `--env TOKEN=TOKEN ` +
+        `--env PORT=3000 ` +
         `--env MONGODB_URI=MONGODB_URI ` +
         `--env BOT_USERNAME=BOT_USERNAME ` +
         `--env VIVID_USER=VIVID_USER ` +
