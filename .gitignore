@@ -113,7 +113,6 @@ dmypy.json
 
 # CI/CD Scripts
 scripts/node_modules/
-dist/
 !/scripts/build/
 
 # working with webhooks
@@ -126,4 +125,8 @@ webhook_pkey.pem
 secret_stuff
 dev_env*
 
-.idea/
+# JetBrains IDEs
+/.idea/
+
+# VS Code
+/.vscode/
