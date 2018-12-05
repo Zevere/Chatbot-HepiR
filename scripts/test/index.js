@@ -6,13 +6,15 @@ $.config.fatal = true
 try {
 
     /**
-     * BEGINNING Remove this before pushing!
+     * Toggle this section to enable local testing
+     * and test by running node scripts/test
      */
     // $.config.verbose = true
     // console.debug('building the tests image with the "chatbot-hepir:test" tag')
     // $.exec(`docker build --tag chatbot-hepir:test --target test .`)
     /**
-     * END Remove this before pushing!
+     * Toggle this section to enable local testing
+     * and test by running node scripts/test
      */
 
     console.info(`Running HepiR unit tests`)

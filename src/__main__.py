@@ -10,22 +10,58 @@ from helper_methods import *
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
+    log_callback_query(call)
+
     if call.data == "cb_viewLists":
         bot.answer_callback_query(call.id, "Here are your lists \(ᵔᵕᵔ)/")
         show_lists(call.message)
+
     elif call.data == "cb_createList":
         bot.answer_callback_query(call.id,
                                   "Create a new List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
+
     elif call.data == "cb_deleteList":
-        bot.answer_callback_query(call.id,
-                                  "Delete an existing List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
+        bot.answer_callback_query(call.id, "Please select a list to delete :)")
+        show_lists_to_delete(call.message)
+
     elif call.data == "cb_selectList":
         bot.answer_callback_query(call.id,
                                   "Select a List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
 
+    else:
+        # delete a list e.g. cb_dlist_listid
+        if call.data.find('cb_dlist_') != -1:
+            selected_list_id = call.data[len('cb_dlist_'):]
+            bot.answer_callback_query(
+                call.id, "You clicked on the list with id={}".format(selected_list_id))
+            bot.send_message(call.message.chat.id,
+                             'Are you sure you want to delete this list?\nList with id of `{}`'.format(
+                                 selected_list_id),
+                             parse_mode="Markdown",
+                             reply_markup=confirm_delete_list_markup(selected_list_id))
+
+        # confirm delete list
+        elif call.data.find('cb_ydlst_') != -1:
+            selected_list_id = call.data[len('cb_ydlst_'):]
+            bot.answer_callback_query(
+                call.id, "You confirmed to delete the list with id={}".format(selected_list_id))
+            delete_list_confirm_btn_clicked(call.message, selected_list_id)
+
+        elif call.data.find('cb_ndlst_') != -1:
+            bot.answer_callback_query(call.id, "Cancelled Action")
+            bot.send_message(
+                call.message.chat.id, "Okay, the list was not deleted. How may I help you today?")
+            # TODO return markup k/b with buttons for each of the /commands
+        #
+        else:
+            bot.answer_callback_query(
+                call.id, "You clicked on the list with id={}".format(call.data))
+
 
 # no args /lists displays lists owned by connected zv account user
 # args with /lists "selects" the list if the listname in args exists and is owned by the connected zv account user
+
+
 @bot.message_handler(commands=['lists'])
 def list_management(msg):
     log_command_info('/lists', msg)
