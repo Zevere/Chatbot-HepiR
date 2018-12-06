@@ -50,25 +50,21 @@ def create_list(zv_user, list_title, list_description):
     # send POST request to borzoo graphql web api to create list with the above list details
     if list_description is not None:
         response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
-                                json={
-            "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\", description: \""+list_description+"\"})\{id\}}"
+                                 json={
+            "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\", description: \""+list_description+"\"}){id}}"
         },
             headers={'Content-Type': 'application/json'})
     else:
         response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
                                  json={
-            "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\"})\{id\}}"
+            "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\"}){id}}"
         },
             headers={'Content-Type': 'application/json'})
 
     if response.status_code == 200:
         response = response.json()
         print('\ncreate_list\nresponse: {}\n'.format(response))
-        if response['data']['createList'] == True:
-            return True, list_id
-        else:
-            # Task list not found
-            return False, None
+        return True, response['data']['createList']['id']
     else:
         # borzoo is offline
         return False, None
