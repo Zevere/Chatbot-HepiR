@@ -38,7 +38,7 @@ def callback_query(call):
             bot.answer_callback_query(
                 call.id, "You clicked on the list with id={}".format(selected_list_id))
             bot.send_message(call.message.chat.id,
-                             'Are you sure you want to `delete` this list?\nList with id of _{}_'.format(
+                             'Are you sure you want to `delete` this list?\nList with id of *{}*'.format(
                                  selected_list_id),
                              parse_mode="Markdown",
                              reply_markup=confirm_delete_list_markup(selected_list_id))
