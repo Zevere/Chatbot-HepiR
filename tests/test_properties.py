@@ -10,7 +10,7 @@ INVALID_ZV_CONNECTION = INVALID_ZEVERE_USER, INVALID_TG_ID
 LIST_TITLE = "Centennial College School Work"
 LIST_DESCRIPTION = "This task list is for managing all the school work I have to do from class."
 
-VALID_LIST_ID = LIST_TITLE.lower().replace(' ', '_')
+VALID_LIST_ID = LIST_TITLE.strip().lower().replace(' ', '_')
 INVALID_LIST_ID = 'xxx. chalbye choo foo?'
 
 VALID_LIST_AND_OWNER = VALID_ZEVERE_USER, VALID_LIST_ID

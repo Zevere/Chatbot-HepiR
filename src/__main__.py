@@ -17,8 +17,11 @@ def callback_query(call):
         show_lists(call.message)
 
     elif call.data == "cb_createList":
-        bot.answer_callback_query(call.id,
-                                  "Create a new List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
+        bot.answer_callback_query(call.id, "Let's create a new list \o/!!")
+        sent = bot.send_message(
+            call.message.chat.id, 'Please enter in the title of your new list:', reply_markup=telebot.types.ForceReply())
+        bot.register_next_step_handler(sent, handle_create_list_id_force_reply)
+        #                           "Create a new List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
 
     elif call.data == "cb_deleteList":
         bot.answer_callback_query(call.id, "Please select a list to delete :)")
@@ -35,7 +38,7 @@ def callback_query(call):
             bot.answer_callback_query(
                 call.id, "You clicked on the list with id={}".format(selected_list_id))
             bot.send_message(call.message.chat.id,
-                             'Are you sure you want to delete this list?\nList with id of `{}`'.format(
+                             'Are you sure you want to `delete` this list?\nList with id of _{}_'.format(
                                  selected_list_id),
                              parse_mode="Markdown",
                              reply_markup=confirm_delete_list_markup(selected_list_id))
@@ -47,19 +50,35 @@ def callback_query(call):
                 call.id, "You confirmed to delete the list with id={}".format(selected_list_id))
             delete_list_confirm_btn_clicked(call.message, selected_list_id)
 
+        # reject delete list
         elif call.data.find('cb_ndlst_') != -1:
             bot.answer_callback_query(call.id, "Cancelled Action")
             bot.send_message(
-                call.message.chat.id, "Okay, the list was not deleted. How may I help you today?")
+                call.message.chat.id, "Okay, the list was not deleted.\nHow may I help you today?")
             # TODO return markup k/b with buttons for each of the /commands
-        #
+
+        # confirm create list
+        elif call.data.find('cb_yclst_') != -1:
+            list_title = call.data[len('cb_yclst_'):]
+            bot.answer_callback_query(
+                call.id, "You confirmed to create the list with title of {}".format(list_title))
+            sent = bot.send_message(
+                call.message.chat.id, 'Great! Thank you for confirming.\nThat is a fantastic title for your new list 8D!\n\nWould you like to add a description to your newly created list?\n\nIf you would not like to add a description, please kindly reply *no*:',
+                parse_mode='Markdown',
+                reply_markup=telebot.types.ForceReply())
+            bot.register_next_step_handler(
+                sent, handle_create_list_description_force_reply, list_title)
+
+        # reject delete list
+        elif call.data.find('cb_nclst_') != -1:
+            bot.answer_callback_query(call.id, "Cancelled Action")
+            bot.send_message(
+                call.message.chat.id, "Okay, the list was not created.\nHow may I help you today?")
+            # TODO return markup k/b with buttons for each of the /commands
+
         else:
             bot.answer_callback_query(
                 call.id, "You clicked on the list with id={}".format(call.data))
-
-
-# no args /lists displays lists owned by connected zv account user
-# args with /lists "selects" the list if the listname in args exists and is owned by the connected zv account user
 
 
 @bot.message_handler(commands=['lists'])
@@ -96,15 +115,10 @@ def get_profile(msg):
 
         fname = resp.get('firstName')
         zv_user = resp.get('id')
-        joined_at = resp.get('joinedAt')
         lname = resp.get('lastName')
 
         print('found this resp:')
         pprint(resp)
-
-        # bot.send_message(msg.chat.id,
-        #                  'You are logged into Zevere as `{}`\n---\nProfile\n---\nZevere Id: `{}`\nFirst Name: {}\nLast Name: {}\n Joined At: {}'.format(
-        #                      zv_user, zv_user, fname, lname, joined_at), parse_mode="Markdown")
 
         bot.send_message(msg.chat.id,
                          'You are logged in as *{} {}* (`{}`).'.format(fname, lname, zv_user), parse_mode="Markdown")

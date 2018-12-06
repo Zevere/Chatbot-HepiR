@@ -4,8 +4,161 @@ import datetime
 from markup import *
 
 
+def is_authenticated(zv_user, tg_id):
+    # TODO
+    pass
+
+
+def logout(zv_user, tg_id):
+    # TODO
+    pass
+
+
+def get_list_by_id(list_id):
+    pass
+
+
+def create_list(zv_user, list_title, list_description):
+    """Creates a list for this Zevere user.
+
+    Keyword arguments:
+    zv_user - the user id of the Zevere user
+    list_title - the title of the list to be deleted
+    list_description - Optional; the description of the list to be deleted
+
+    Returns:
+        True, list id   - upon successful creation
+        False, None     - upon failure
+    """
+
+    list_id = convert_list_title_to_id(list_title)
+
+    print(
+        '\nLIST DETAILS\nlist_title={}\nlist_id={}\nlist_description={}\nowner={}\n'.format(
+            list_title, list_id, list_description, zv_user)
+    )
+
+    # TODO change to use get list here instead of get_all_lists once the func is implemented in BORZOO
+
+    # check if list exists for the user already
+    owned_lists = get_all_lists(zv_user)
+    for list in owned_lists:
+        if list['id'] == list_id:
+            return False, None
+
+    # if reached here, means list does not already exist for this zv_user
+    # send POST request to borzoo graphql web api to create list with the above list details
+    if list_description is not None:
+        response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
+                                json={
+            "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\", description: \""+list_description+"\"})\{id\}}"
+        },
+            headers={'Content-Type': 'application/json'})
+    else:
+        response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
+                                 json={
+            "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\"})\{id\}}"
+        },
+            headers={'Content-Type': 'application/json'})
+
+    if response.status_code == 200:
+        response = response.json()
+        print('\ncreate_list\nresponse: {}\n'.format(response))
+        if response['data']['createList'] == True:
+            return True, list_id
+        else:
+            # Task list not found
+            return False, None
+    else:
+        # borzoo is offline
+        return False, None
+
+    return False, None
+
+# need to use this when creating tasks/lists and verify that the id converted from the title will be within the 55 char limit boundary.
+
+
+def is_valid_id_len(id):
+    """Validates whether passed in id is within 55 character limit boundary.
+
+    Due to telegram bot API restrictions, callback data can at most contain 64 characters. The callback headers in this app have been defined to be 9 chars in length. This leaves 55 char maximum for the variable data length.
+
+    Returns:
+        True, remaining characters left over from 55 - id length
+        False, None
+    """
+    within_bounds = len(id) <= 55
+    leftover_char_limit = 55-len(id)
+    return within_bounds, leftover_char_limit
+
+
+def convert_list_title_to_id(list_title):
+    return list_title.strip().lower().replace(' ', '_')
+
+
+def handle_create_list_description_force_reply(msg, list_title):
+    list_description = msg.text
+
+    if list_description == 'no':
+        list_description = None
+
+    zv_user = find_connected_zv_user(msg)
+
+    # if list_description is not None:
+    create_list_results = create_list(zv_user, list_title, list_description)
+    # else:
+    # create_list_results = create_list(zv_user, list_title)
+
+    if create_list_results[0]:
+        bot.send_message(msg.chat.id,
+                         'Thank you for your input dear.\n\nYour new list has been successfully created with the following details:\n\nList Title: _{}_\nList Owner: _{}_{}'.format(
+                             list_title, zv_user,
+                             '\nList Description: _{}_'.format(
+                                 list_description) if list_description is not None else ''
+                         ),
+                         parse_mode="Markdown"
+                         )
+    else:
+        bot.send_message(msg.chat.id,
+                         'An error has occured and the list was not created.',
+                         parse_mode="Markdown",)
+
+    return
+
+
+def handle_create_list_id_force_reply(msg):
+    """Solicits list title from user, then prompts user for list creation confirmation.
+    """
+    list_title = msg.text
+    list_id = convert_list_title_to_id(list_title)
+    print('\nlist_title={}\nlist_id={}'.format(list_title, list_id))
+    print('len of the list_id={}\nValid len id={}\n'.format(
+        len(list_id), is_valid_id_len(list_id)[0]))
+
+    within_bounds, leftover_char_limit = is_valid_id_len(list_id)
+
+    if within_bounds:
+        bot.send_message(msg.chat.id,
+                         'Are you sure you want to `create` this list?\n\nYour new list will have a title of _{}_'.format(
+                             list_title),
+                         parse_mode="Markdown",
+                         reply_markup=confirm_create_list_markup(list_title)
+                         )
+    else:
+        bot.send_message(msg.chat.id,
+                         'Your title is too long!The maximum number of characters permitted for a list title is 55 characters.\n\nYour list title exceeded this amount by *{}* characters.\n\nPlease return to List Management (/lists) and try again with a different title :)'.format(
+                             abs(leftover_char_limit)),
+                         parse_mode="Markdown"
+                         )
+    return
+
+
 def delete_list(zv_user, list_id):
     """Deletes a list belonging to a Zevere user.
+
+    Keyword arguments:
+    zv_user - the user id of the Zevere user
+    list_id - the id of the list to be deleted
 
     Returns:
         True, list id   - upon successful delete
@@ -14,7 +167,7 @@ def delete_list(zv_user, list_id):
     # send POST request to borzoo graphql web api to delete list belonging to the current connected zv user
     response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
                              json={
-                                 "query": "mutation{ deleteList(owner:\"" + zv_user + "\", list:\""+list_id+"\")}"
+        "query": "mutation{ deleteList(owner:\"" + zv_user + "\", list:\""+list_id+"\")}"
     },
         headers={'Content-Type': 'application/json'})
 
@@ -31,38 +184,26 @@ def delete_list(zv_user, list_id):
         return False, None
 
 
-def create_list(zv_user, list_title, list_desc):
-    # TODO
-    pass
-
-
-def is_authenticated(zv_user, tg_id):
-    # TODO
-    pass
-
-
-def logout(zv_user, tg_id):
-    # TODO
-    pass
-
-
 def delete_list_confirm_btn_clicked(msg, list_id):
     print('\n\nTrying to delete list with id = {}\n'.format(list_id))
     zv_user = find_connected_zv_user(msg)
-    delete_results = delete_list(zv_user, list_id)
-    if(delete_results[0]):
+    delete_list_results = delete_list(zv_user, list_id)
+    if(delete_list_results[0]):
         bot.send_message(msg.chat.id,
                          'The list with the id `{}` was successfully deleted.'.format(
-                             delete_results[1]),
+                             delete_list_results[1]),
                          parse_mode="Markdown",)
     else:
         bot.send_message(msg.chat.id,
-                         'The list was not deleted.',
+                         'An error has occured and the list was not deleted.',
                          parse_mode="Markdown",)
 
 
 def find_connected_zv_user(msg):
     """Gets the zevere user account connected to this telegram user.
+
+    Keyword arguments:
+    msg - the telegram message that intiated this function call
 
     Returns:
         Username of the Zevere account if found a connection with the current telegram account. Otherwise, returns None.
@@ -75,15 +216,6 @@ def find_connected_zv_user(msg):
         return None
 
 
-def validate_id_len(id):
-    """Validates whether passed in id is within 55 character limit boundary.
-
-    Due to telegram bot API restrictions, callback data can at most contain 64 characters. The callback headers in this app have been defined to be 9 chars in length. This leaves 55 char maximum for the variable data length.
-    """
-    # TODO - need to use this when creating tasks/lists and verify that the id converted from the title will be within the 55 char limit boundary.
-    pass
-
-
 def get_all_lists(zv_user):
     """Returns a list of all the lists owned by zv_user.
 
@@ -93,7 +225,7 @@ def get_all_lists(zv_user):
     # send POST request to borzoo graphql web api to query lists belonging to connected zv user
     response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
                              json={
-                                 "query": "query{ user(userId:\"" + zv_user + "\") { lists { id collaborators createdAt description owner tags tasks { id } title updatedAt } } }"
+        "query": "query{ user(userId:\"" + zv_user + "\") { lists { id collaborators createdAt description owner tags tasks { id } title updatedAt } } }"
     },
         headers={'Content-Type': 'application/json'})
 
@@ -121,7 +253,7 @@ def show_lists_to_delete(msg):
                          )
     else:
         bot.send_message(msg.chat.id,
-                         'You do not currently own any lists. Please create a list by visiting our beloved List Management using the /lists command :)!',
+                         'You do not currently own any lists.\n\nPlease create a list by visiting our beloved *List Management* using the /lists command :)!',
                          parse_mode="Markdown",
                          )
 
@@ -136,19 +268,12 @@ def show_lists(msg):
     list_count = 0
 
     for list in owned_lists:
-        if hasattr(list, 'description'):
+        if list['description'] is not None:
             list_output_string += "Title: {}\nDescription: {}\n\n".format(
                 list['title'], list['description'])
         else:
             list_output_string += "Title: {}\n\n".format(list['title'])
         list_count += 1
-
-    # if 'ican put fake id here that alrady exists? suka blyat' in list_output_string:
-    #     print('list with id of \"{}\" already exists as a list owned by {}'.format(
-    #         'ican put fake id here that alrady exists? suka blyat', zv_user))
-    # else:
-    #     print('list with id of \"{}\" will now be created with the owner as {}'.format(
-    #         'ican put fake id here that alrady exists? suka blyat', zv_user))
 
     if list_count > 0:
         bot.send_message(msg.chat.id,
@@ -158,7 +283,7 @@ def show_lists(msg):
                          parse_mode="Markdown")
     else:
         bot.send_message(msg.chat.id,
-                         'You do not currently own any lists. Please create a list by visiting our beloved List Management using the /lists command :)!',
+                         'You do not currently own any lists.\n\nPlease create a list by visiting our beloved *List Management* using the /lists command :)!',
                          parse_mode="Markdown",
                          )
 

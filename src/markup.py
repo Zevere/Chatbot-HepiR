@@ -42,3 +42,15 @@ def confirm_delete_list_markup(selected_list_id):
             'No', callback_data='cb_ndlst_{}'.format(selected_list_id)),
     )
     return markup
+
+
+def confirm_create_list_markup(list_title):
+    markup = InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        InlineKeyboardButton(
+            # callback_data headers must be 9 length in this app's design
+            'Yes', callback_data='cb_yclst_{}'.format(list_title)),
+        InlineKeyboardButton(
+            'No', callback_data='cb_nclst_{}'.format(list_title)),
+    )
+    return markup
