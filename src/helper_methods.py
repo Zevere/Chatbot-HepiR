@@ -15,7 +15,13 @@ def logout(zv_user, tg_id):
 
 
 def get_list_by_id(list_id):
+
     pass
+
+
+def remove_reply_keyboard(tbot, cb_call):
+    tbot.edit_message_reply_markup(
+        chat_id=cb_call.message.chat.id, message_id=cb_call.message.json['message_id'], reply_markup=hide_inline_keyboard_markup())
 
 
 def create_list(zv_user, list_title, list_description):
@@ -134,6 +140,17 @@ def handle_create_list_id_force_reply(msg):
     within_bounds, leftover_char_limit = is_valid_id_len(list_id)
 
     if within_bounds:
+        # check that the list does not already exist in Zevere for this user
+        zv_user = find_connected_zv_user(msg)
+        owned_lists = get_all_lists(zv_user)
+        for list in owned_lists:
+            if list['id'] == list_id:
+                bot.send_message(msg.chat.id, 'You already have a list created with the title of _{}_!\n\nYou cannot create duplicate lists with the same title in Zevere.\n\nPlease try again with a different name :)!'.format(
+                    list_title),
+                    parse_mode="Markdown"
+                )
+                return
+
         bot.send_message(msg.chat.id,
                          'Are you sure you want to `create` this list?\n\nYour new list will have a title of _{}_'.format(
                              list_title),
@@ -184,6 +201,7 @@ def delete_list_confirm_btn_clicked(msg, list_id):
     print('\n\nTrying to delete list with id = {}\n'.format(list_id))
     zv_user = find_connected_zv_user(msg)
     delete_list_results = delete_list(zv_user, list_id)
+
     if(delete_list_results[0]):
         bot.send_message(msg.chat.id,
                          'The list with the id `{}` was successfully deleted.'.format(

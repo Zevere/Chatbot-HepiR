@@ -3,7 +3,7 @@ import telebot
 from flask import Flask
 from pymongo import MongoClient
 
-VERSION = "3.7.3"
+VERSION = "3.7.4"
 KNOWN_COMMANDS = ('/start', '/about', '/login', '/me',
                   '/lists', '/caps <insert text>')
 

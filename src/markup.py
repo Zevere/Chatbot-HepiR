@@ -1,4 +1,8 @@
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
+
+
+def hide_inline_keyboard_markup():
+    return None
 
 
 def list_management_markup():

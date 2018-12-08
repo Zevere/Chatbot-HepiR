@@ -21,7 +21,6 @@ def callback_query(call):
         sent = bot.send_message(
             call.message.chat.id, 'Please enter in the title of your new list:', reply_markup=telebot.types.ForceReply())
         bot.register_next_step_handler(sent, handle_create_list_id_force_reply)
-        #                           "Create a new List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
 
     elif call.data == "cb_deleteList":
         bot.answer_callback_query(call.id, "Please select a list to delete :)")
@@ -37,24 +36,28 @@ def callback_query(call):
             selected_list_id = call.data[len('cb_dlist_'):]
             bot.answer_callback_query(
                 call.id, "You clicked on the list with id={}".format(selected_list_id))
-            bot.send_message(call.message.chat.id,
-                             'Are you sure you want to `delete` this list?\nList with id of *{}*'.format(
-                                 selected_list_id),
-                             parse_mode="Markdown",
-                             reply_markup=confirm_delete_list_markup(selected_list_id))
+            sent = bot.send_message(call.message.chat.id,
+                                    'Are you sure you want to `delete` this list?\nList with id of *{}*'.format(
+                                        selected_list_id),
+                                    parse_mode="Markdown",
+                                    reply_markup=confirm_delete_list_markup(selected_list_id))
+            print('\n\nINSIDE delete a list\n')
+            pprint(sent.__dict__)
 
         # confirm delete list
         elif call.data.find('cb_ydlst_') != -1:
             selected_list_id = call.data[len('cb_ydlst_'):]
             bot.answer_callback_query(
                 call.id, "You confirmed to delete the list with id={}".format(selected_list_id))
+            remove_reply_keyboard(bot, call)
             delete_list_confirm_btn_clicked(call.message, selected_list_id)
 
         # reject delete list
         elif call.data.find('cb_ndlst_') != -1:
             bot.answer_callback_query(call.id, "Cancelled Action")
+            remove_reply_keyboard(bot, call)
             bot.send_message(
-                call.message.chat.id, "Okay, the list was not deleted.\nHow may I help you today?")
+                call.message.chat.id, "Okay, the list was not deleted.\nHow may I help you today?", reply_markup=telebot.types.ReplyKeyboardRemove())
             # TODO return markup k/b with buttons for each of the /commands
 
         # confirm create list
@@ -62,6 +65,7 @@ def callback_query(call):
             list_title = call.data[len('cb_yclst_'):]
             bot.answer_callback_query(
                 call.id, "You confirmed to create the list with title of {}".format(list_title))
+            remove_reply_keyboard(bot, call)
             sent = bot.send_message(
                 call.message.chat.id, 'Great! Thank you for confirming.\nThat is a fantastic title for your new list 8D!\n\nWould you like to add a description to your newly created list?\n\nIf you would not like to add a description, please kindly reply *no*:',
                 parse_mode='Markdown',
@@ -72,6 +76,7 @@ def callback_query(call):
         # reject delete list
         elif call.data.find('cb_nclst_') != -1:
             bot.answer_callback_query(call.id, "Cancelled Action")
+            remove_reply_keyboard(bot, call)
             bot.send_message(
                 call.message.chat.id, "Okay, the list was not created.\nHow may I help you today?")
             # TODO return markup k/b with buttons for each of the /commands
