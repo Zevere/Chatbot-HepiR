@@ -15,7 +15,7 @@ def logout(zv_user, tg_id):
 
 
 def get_list_by_id(list_id):
-
+    # TODO implement this func when the feature has been implemented in the BORZOO graphql api
     pass
 
 

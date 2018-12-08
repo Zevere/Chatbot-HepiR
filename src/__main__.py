@@ -41,8 +41,6 @@ def callback_query(call):
                                         selected_list_id),
                                     parse_mode="Markdown",
                                     reply_markup=confirm_delete_list_markup(selected_list_id))
-            print('\n\nINSIDE delete a list\n')
-            pprint(sent.__dict__)
 
         # confirm delete list
         elif call.data.find('cb_ydlst_') != -1:
@@ -190,17 +188,6 @@ def about(msg):
                      "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
                          VERSION, KNOWN_COMMANDS))
     return
-
-
-@bot.message_handler(commands=['caps'])
-def caps(msg):
-    log_command_info(msg.text, msg)
-    args = extract_args(msg.text)
-    if len(args) > 0:
-        bot.reply_to(msg, "".join(map(lambda str: str.upper() + ' ', args)))
-    else:
-        return
-
 
 @bot.inline_handler(lambda query: query)
 def query_text(inline_query):
