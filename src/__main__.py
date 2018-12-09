@@ -136,8 +136,19 @@ def get_profile(msg):
                          'You are not logged into Zevere. Please login at {} and use the Login Widget provided on the Profile page after logging in :)!'.format(COHERENT_ROOT_URL))
 
 
+@bot.message_handler(commands=['logout'])
+def logout(msg):
+    log_command_info('/logout', msg)
+    tg_id = msg.chat.id
+    found_connection = user_collection.find_one({'tg_id': str(tg_id)})
+    zv_user = found_connection.get('zv_user')
+    disconnect(zv_user, tg_id, bot=bot, msg=msg)
+    return
+
 # If logged in, HepiR sends friendly welcome message and tells tg user who they are logged in as (zv_user)
 # Else, provides redirect link to user to login to Coherent and tells them to click on login widget under profile
+
+
 @bot.message_handler(commands=['login'])
 def login(msg):
     log_command_info('/login', msg)
@@ -188,6 +199,7 @@ def about(msg):
                      "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
                          VERSION, KNOWN_COMMANDS))
     return
+
 
 @bot.inline_handler(lambda query: query)
 def query_text(inline_query):

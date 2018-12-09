@@ -2,6 +2,7 @@ import requests
 from properties import *
 import datetime
 from markup import *
+from pprint import pprint
 
 
 def is_authenticated(zv_user, tg_id):
@@ -9,7 +10,7 @@ def is_authenticated(zv_user, tg_id):
     pass
 
 
-def logout(zv_user, tg_id):
+def connect(zv_user, tg_id):
     # TODO
     pass
 
@@ -17,6 +18,72 @@ def logout(zv_user, tg_id):
 def get_list_by_id(list_id):
     # TODO implement this func when the feature has been implemented in the BORZOO graphql api
     pass
+
+
+# optional bot param, will not be used in testing
+def disconnect(zv_user, tg_id, bot=None, msg=None):
+    # send DELETE request to vivid to remove the  associations of an existing Zevere user to the Zevere chat bots.
+    should_remove_connection_from_hepir_db = False
+    vivid_request = requests.delete('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
+                                    auth=(VIVID_USER, VIVID_PASSWORD))
+    print(
+        '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
+                                                                             vivid_request.request,
+                                                                             vivid_request.url,
+                                                                             vivid_request.status_code))
+    # Reference from documentation provided at: https://zv-botops-vivid.herokuapp.com/api/docs/swagger/index.html
+
+    # status_code == 204
+    # Registration is deleted
+    if vivid_request.status_code == 204:
+        print('[{}] Registration is deleted for ({})'.format(
+            str(datetime.datetime.now()).split('.')[0], zv_user))
+        should_remove_connection_from_hepir_db = True
+
+    # status_code == 400
+    # User ID is invalid or does not exist
+    elif vivid_request.status_code == 400:
+        print('[{}] User ID ({}) is invalid or does not exist'.format(str(datetime.datetime.now()).split('.')[0],
+                                                                      zv_user))
+        pprint(vivid_request.json())
+
+    # status_code == 404
+    # User has not registered with any of the Zevere chat bots
+    elif vivid_request.status_code == 404:
+        print('[{}] User ({}) has not registered with any of the Zevere chat bots'.format(
+            str(datetime.datetime.now()).split('.')[0], zv_user))
+        pprint(vivid_request.json())
+
+    if should_remove_connection_from_hepir_db:
+        # remove user connection from hepir db, if it exists
+        if user_collection.find_one({
+            'zv_user': zv_user,
+            'tg_id': str(tg_id)
+        }):
+            result = user_collection.delete_one({
+                'zv_user': zv_user,
+                'tg_id': str(tg_id)
+            }).deleted_count
+
+            if result == 1:
+                print('[{}] Successfully removed {} user with zv_user={} and tg_id={} from the HepiR database.'.format(
+                    str(datetime.datetime.now()).split('.')[0], result, zv_user, tg_id))
+
+                if bot is not None:
+                    bot.send_message(msg.chat.id, 'You have successfully disconnected your telegram account to the Zevere ID: `{}`'.format(zv_user),
+                                     parse_mode="Markdown"
+                                     )
+            else:
+                print('[{}] Failed to remove user with zv_user={} and tg_id={} from the HepiR database.'.format(
+                    str(datetime.datetime.now()).split('.')[0], zv_user, tg_id))
+
+        # if user connection does not exist in hepir db, don't need to remove
+        else:
+            if bot is not None:
+                bot.send_message(msg.chat.id, 'Your telegram account is not connected to the Zevere ID: `{}`'.format(zv_user),
+                                 parse_mode="Markdown"
+                                 )
+    return
 
 
 def remove_reply_keyboard(tbot, cb_call):

@@ -30,7 +30,7 @@ def login_widget():
     # TODO: telegram chat bot web app verifies that the authorization is sent by Telegram and not some third party
 
     # check if zv_user already exists; duplicate users results in 503 error from VIVID API
-    should_connect_hepir = False
+    should_add_connection_to_hepir_db = False
     vivid_request = requests.get('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
                                  auth=(VIVID_USER, VIVID_PASSWORD))
 
@@ -46,7 +46,7 @@ def login_widget():
         print('[{}] User registration found for ({})'.format(
             str(datetime.datetime.now()).split('.')[0], zv_user))
         pprint(vivid_request.json())
-        should_connect_hepir = True
+        should_add_connection_to_hepir_db = True
 
     # status_code == 400
     # USE CASE 2: zv_user is not registered in Zevere
@@ -62,7 +62,7 @@ def login_widget():
         print('[{}] User ({}) has not registered with any of the Zevere chat bots'.format(
             str(datetime.datetime.now()).split('.')[0], zv_user))
         pprint(vivid_request.json())
-        should_connect_hepir = True
+        should_add_connection_to_hepir_db = True
 
     # connect zv_user to tg_id if not exists in hepir db
     # send post with {
@@ -70,11 +70,11 @@ def login_widget():
     #   "chatUserId": "string"
     # }
     # as payload to vivid api
-    if should_connect_hepir:
+    if should_add_connection_to_hepir_db:
         # if user connection already in hepir db, don't add again
         if user_collection.find_one({
             'zv_user': zv_user,
-            'tg_id': tg_id
+            'tg_id': str(tg_id)
         }):
             print('[{}] (zv_user={}, tg_id={}) found in (db={}) => {} is a returning user :)!'.format(
                 str(datetime.datetime.now()).split('.')[0], zv_user, tg_id, MONGODB_DBNAME, first_name))
@@ -96,7 +96,7 @@ def login_widget():
 
         # if tg_id connected to another zv_user, don't connect
         elif user_collection.find_one({
-            'tg_id': tg_id
+            'tg_id': str(tg_id)
         }):
             requests.get(
                 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text=Your telegram account is already connected to another Zevere ID!&parse_mode=Markdown'.format(
