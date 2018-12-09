@@ -1,13 +1,32 @@
 from markup import *
+from hepir_logging import (
+    log_callback_query,
+    log_command_info,
+    log_inline_query_info,
+    log_received_text_msg,
+)
+from authentication import(
+    connect,
+    disconnect,
+)
 
 # Flask Routes ------------------------------------------------------------------------------------------
 from flask_routes import *
 
 # Helper methods ------------------------------------------------------------------------------------------
-from helper_methods import *
-
+from helper_methods import(
+    show_lists,
+    handle_create_list_description_force_reply,
+    show_lists_to_delete,
+    handle_create_list_id_force_reply,
+    remove_reply_keyboard,
+    delete_list_confirm_btn_clicked,
+    init,
+)
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     log_callback_query(call)
@@ -196,7 +215,7 @@ def start(msg):
 def about(msg):
     log_command_info('/about', msg)
     bot.send_message(msg.chat.id,
-                     "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
+                     "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!~\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
                          VERSION, KNOWN_COMMANDS))
     return
 

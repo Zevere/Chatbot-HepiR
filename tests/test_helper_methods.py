@@ -1,5 +1,6 @@
-from helper_methods import *
 from test_properties import *
+from authentication import connect, disconnect
+from list_management import create_list, get_all_lists, delete_list
 
 
 class TestAuthentication(object):

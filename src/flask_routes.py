@@ -3,7 +3,7 @@ import datetime
 import requests
 from flask import request, redirect
 from properties import *
-from helper_methods import connect
+from authentication import connect
 
 
 # webhook will send update to the bot, so need to process update messages received
