@@ -21,9 +21,9 @@ try {
 
     const exec_result = $.exec(
         `docker run --rm --tty ` +
-        `--env TOKEN=TOKEN ` +
-        `--env MONGODB_URI=MONGODB_URI ` +
-        `--env BOT_USERNAME=BOT_USERNAME ` +
+        `--env TOKEN=$TOKEN ` +
+        `--env MONGODB_URI=$MONGODB_URI ` +
+        `--env BOT_USERNAME=$BOT_USERNAME ` +
         `--env VIVID_USER=$VIVID_USER ` +
         `--env VIVID_PASSWORD=$VIVID_PASSWORD ` +
         `chatbot-hepir:test`

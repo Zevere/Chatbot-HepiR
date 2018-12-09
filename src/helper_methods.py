@@ -22,8 +22,6 @@ def connect(zv_user, tg_id, first_name="He/She", bot=None, msg=None):
     vivid_request = requests.get('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
                                  auth=(VIVID_USER, VIVID_PASSWORD))
 
-    print('u={}\np=JK NOT GONNA SHOW U'.format(VIVID_USER))
-
     print(
         '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
                                                                              vivid_request.request,
@@ -177,8 +175,6 @@ def disconnect(zv_user, tg_id, bot=None, msg=None):
     should_remove_connection_from_hepir_db = False
     vivid_request = requests.delete('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
                                     auth=(VIVID_USER, VIVID_PASSWORD))
-
-    print('u={}\np=JK NOT GONNA SHOW U'.format(VIVID_USER))
 
     print(
         '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
