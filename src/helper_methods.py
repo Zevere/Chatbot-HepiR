@@ -10,17 +10,18 @@ def is_authenticated(zv_user, tg_id):
     pass
 
 
-def connect(zv_user, tg_id):
-    # TODO
-    pass
-
-
 def get_list_by_id(list_id):
     # TODO implement this func when the feature has been implemented in the BORZOO graphql api
     pass
 
 
-# optional bot param, will not be used in testing
+# optional params, will not be used in testing
+def connect(zv_user, tg_id, fname="He/She", bot=None, msg=None):
+    # TODO
+    pass
+
+
+# optional params here, will not be used in testing
 def disconnect(zv_user, tg_id, bot=None, msg=None):
     # send DELETE request to vivid to remove the  associations of an existing Zevere user to the Zevere chat bots.
     should_remove_connection_from_hepir_db = False
@@ -70,7 +71,7 @@ def disconnect(zv_user, tg_id, bot=None, msg=None):
                     str(datetime.datetime.now()).split('.')[0], result, zv_user, tg_id))
 
                 if bot is not None:
-                    bot.send_message(msg.chat.id, 'You have successfully disconnected your telegram account to the Zevere ID: `{}`'.format(zv_user),
+                    bot.send_message(msg.chat.id, 'You have successfully disconnected your telegram account from the Zevere ID: `{}`'.format(zv_user),
                                      parse_mode="Markdown"
                                      )
             else:
