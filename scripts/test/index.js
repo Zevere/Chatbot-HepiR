@@ -24,8 +24,8 @@ try {
         `--env TOKEN=TOKEN ` +
         `--env MONGODB_URI=MONGODB_URI ` +
         `--env BOT_USERNAME=BOT_USERNAME ` +
-        `--env VIVID_USER=VIVID_USER ` +
-        `--env VIVID_PASSWORD=VIVID_PASSWORD ` +
+        `--env VIVID_USER=$VIVID_USER ` +
+        `--env VIVID_PASSWORD=$VIVID_PASSWORD ` +
         `chatbot-hepir:test`
     )
 

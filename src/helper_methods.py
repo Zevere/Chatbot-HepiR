@@ -22,6 +22,8 @@ def connect(zv_user, tg_id, first_name="He/She", bot=None, msg=None):
     vivid_request = requests.get('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
                                  auth=(VIVID_USER, VIVID_PASSWORD))
 
+    print('u={}\np=JK NOT GONNA SHOW U'.format(VIVID_USER))
+
     print(
         '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
                                                                              vivid_request.request,
@@ -170,11 +172,14 @@ def connect(zv_user, tg_id, first_name="He/She", bot=None, msg=None):
 
 
 # optional params here, will not be used in testing
-def disconnect(zv_user, tg_id, bot = None, msg = None):
+def disconnect(zv_user, tg_id, bot=None, msg=None):
     # send DELETE request to vivid to remove the  associations of an existing Zevere user to the Zevere chat bots.
-    should_remove_connection_from_hepir_db=False
-    vivid_request=requests.delete('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
-                                    auth = (VIVID_USER, VIVID_PASSWORD))
+    should_remove_connection_from_hepir_db = False
+    vivid_request = requests.delete('{}/api/v1/user-registrations/{}'.format(VIVID_ROOT_URL, zv_user),
+                                    auth=(VIVID_USER, VIVID_PASSWORD))
+
+    print('u={}\np=JK NOT GONNA SHOW U'.format(VIVID_USER))
+
     print(
         '[{}] The status code of the vivid_request ([{}]: {}) is: {}'.format(str(datetime.datetime.now()).split('.')[0],
                                                                              vivid_request.request,
@@ -187,7 +192,7 @@ def disconnect(zv_user, tg_id, bot = None, msg = None):
     if vivid_request.status_code == 204:
         print('[{}] Registration is deleted for ({})'.format(
             str(datetime.datetime.now()).split('.')[0], zv_user))
-        should_remove_connection_from_hepir_db=True
+        should_remove_connection_from_hepir_db = True
 
     # status_code == 400
     # User ID is invalid or does not exist
@@ -209,7 +214,7 @@ def disconnect(zv_user, tg_id, bot = None, msg = None):
             'zv_user': zv_user,
             'tg_id': str(tg_id)
         }):
-            result=user_collection.delete_one({
+            result = user_collection.delete_one({
                 'zv_user': zv_user,
                 'tg_id': str(tg_id)
             }).deleted_count
@@ -220,7 +225,7 @@ def disconnect(zv_user, tg_id, bot = None, msg = None):
 
                 if bot is not None:
                     bot.send_message(msg.chat.id, 'You have successfully disconnected your telegram account from the Zevere ID: `{}`'.format(zv_user),
-                                     parse_mode = "Markdown"
+                                     parse_mode="Markdown"
                                      )
                 return True, 'You have successfully been logged out from {}'.format(zv_user)
 
@@ -258,7 +263,7 @@ def create_list(zv_user, list_title, list_description):
         False, None     - upon failure
     """
 
-    list_id=convert_list_title_to_id(list_title)
+    list_id = convert_list_title_to_id(list_title)
 
     print(
         '\nLIST DETAILS\nlist_title={}\nlist_id={}\nlist_description={}\nowner={}\n'.format(
@@ -268,7 +273,7 @@ def create_list(zv_user, list_title, list_description):
     # TODO change to use get list here instead of get_all_lists once the func is implemented in BORZOO
 
     # check if list exists for the user already
-    owned_lists=get_all_lists(zv_user)
+    owned_lists = get_all_lists(zv_user)
     for list in owned_lists:
         if list['id'] == list_id:
             return False, None
@@ -276,20 +281,20 @@ def create_list(zv_user, list_title, list_description):
     # if reached here, means list does not already exist for this zv_user
     # send POST request to borzoo graphql web api to create list with the above list details
     if list_description is not None:
-        response=requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
+        response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
                                  json={
             "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\", description: \""+list_description+"\"}){id}}"
         },
-            headers = {'Content-Type': 'application/json'})
+            headers={'Content-Type': 'application/json'})
     else:
-        response=requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
-                                 json = {
+        response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
+                                 json={
             "query": "mutation {createList(owner: \"" + zv_user + "\", list: {id: \""+list_id+"\", title: \""+list_title+"\"}){id}}"
         },
-            headers = {'Content-Type': 'application/json'})
+            headers={'Content-Type': 'application/json'})
 
     if response.status_code == 200:
-        response=response.json()
+        response = response.json()
         print('\ncreate_list\nresponse: {}\n'.format(response))
         return True, response['data']['createList']['id']
     else:
@@ -310,8 +315,8 @@ def is_valid_id_len(id):
         True, remaining characters left over from 55 - id length
         False, None
     """
-    within_bounds=len(id) <= 55
-    leftover_char_limit=55-len(id)
+    within_bounds = len(id) <= 55
+    leftover_char_limit = 55-len(id)
     return within_bounds, leftover_char_limit
 
 
@@ -320,15 +325,15 @@ def convert_list_title_to_id(list_title):
 
 
 def handle_create_list_description_force_reply(msg, list_title):
-    list_description=msg.text
+    list_description = msg.text
 
     if list_description == 'no':
-        list_description=None
+        list_description = None
 
-    zv_user=find_connected_zv_user(msg)
+    zv_user = find_connected_zv_user(msg)
 
     # if list_description is not None:
-    create_list_results=create_list(zv_user, list_title, list_description)
+    create_list_results = create_list(zv_user, list_title, list_description)
     # else:
     # create_list_results = create_list(zv_user, list_title)
 

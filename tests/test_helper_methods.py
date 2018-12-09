@@ -47,41 +47,42 @@ class TestListManagmement(object):
     #     # try to get a non existent list
     #     assert get_list_by_id(INVALID_LIST_ID) is None
 
-    class TestAuthentication(object):
-        def test_login(self):
-            # TEST ENV SETUP
-            # make sure the valid account is logged out first before trying to login with the account
-            disconnect(*VALID_ZV_CONNECTION)
 
-            # trying to login with valid credentials
-            assert connect(*VALID_ZV_CONNECTION) == (
-                True, 'You have successfully logged into the Zevere account {} with your telegram account of {}'.format(VALID_ZV_CONNECTION[0], VALID_ZV_CONNECTION[1]))
+class TestAuthentication(object):
+    def test_login(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged out first before trying to login with the account
+        disconnect(*VALID_ZV_CONNECTION)
 
-            # trying to login with invalid credentials
-            assert connect(*INVALID_ZV_CONNECTION) == (
-                False, 'You have provided invalid login credentials.')
-            pass
+        # trying to login with valid credentials
+        assert connect(*VALID_ZV_CONNECTION) == (
+            True, 'You have successfully logged into the Zevere account {} with your telegram account of {}'.format(VALID_ZV_CONNECTION[0], VALID_ZV_CONNECTION[1]))
 
-        # def test_is_authenticated(self):
-        #     # test authentication for valid tg->zv connection
-        #     # should return True and the zv_user the tg user is auth'd as
-        #     assert is_authenticated(
-        #         *VALID_ZV_CONNECTION) == (True, VALID_ZV_CONNECTION[0])
+        # trying to login with invalid credentials
+        assert connect(*INVALID_ZV_CONNECTION) == (
+            False, 'You have provided invalid login credentials.')
+        pass
 
-        #     # test authentication for invalid tg->zv connection
-        #     # should return False and None since tg user not auth'd
-        #     assert is_authenticated(*INVALID_ZV_CONNECTION) == (False, None)
+    # def test_is_authenticated(self):
+    #     # test authentication for valid tg->zv connection
+    #     # should return True and the zv_user the tg user is auth'd as
+    #     assert is_authenticated(
+    #         *VALID_ZV_CONNECTION) == (True, VALID_ZV_CONNECTION[0])
 
-        def test_logout(self):
+    #     # test authentication for invalid tg->zv connection
+    #     # should return False and None since tg user not auth'd
+    #     assert is_authenticated(*INVALID_ZV_CONNECTION) == (False, None)
 
-            # TEST ENV SETUP
-            # make sure the valid account is logged in first before trying to logout with the account
-            connect(*VALID_ZV_CONNECTION)
+    def test_logout(self):
 
-            # trying to logout valid telegram to zevere connection
-            assert disconnect(*VALID_ZV_CONNECTION) == (
-                True, 'You have successfully been logged out from {}'.format(VALID_ZV_CONNECTION[0]))
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first before trying to logout with the account
+        connect(*VALID_ZV_CONNECTION)
 
-            # trying to logout with invalid telegram to zevere connection
-            assert disconnect(*INVALID_ZV_CONNECTION) == (
-                False, 'You are not logged in to any Zevere account.')
+        # trying to logout valid telegram to zevere connection
+        assert disconnect(*VALID_ZV_CONNECTION) == (
+            True, 'You have successfully been logged out from {}'.format(VALID_ZV_CONNECTION[0]))
+
+        # trying to logout with invalid telegram to zevere connection
+        assert disconnect(*INVALID_ZV_CONNECTION) == (
+            False, 'You are not logged in to any Zevere account.')
