@@ -7,6 +7,11 @@ from list_management import (
     create_list,
     get_all_lists,
     delete_list,
+    get_list_by_id,
+)
+
+from task_management import(
+    get_all_tasks,
 )
 
 
@@ -135,20 +140,32 @@ def find_connected_zv_user(msg):
         return None
 
 
-def show_lists_to_delete(msg):
+def show_lists_to(action, msg):
     zv_user = find_connected_zv_user(msg)
     owned_lists = get_all_lists(zv_user)
     if len(owned_lists) > 0:
         bot.send_message(msg.chat.id,
-                         'Please click on the list you wish to `delete`:',
+                         'Please click on the list you wish to `{}`:'.format(
+                             action),
                          parse_mode="Markdown",
-                         reply_markup=delete_list_markup(owned_lists)
+                         reply_markup=delete_list_markup(
+                             owned_lists) if action == 'delete' else select_list_markup(owned_lists)
                          )
     else:
         bot.send_message(msg.chat.id,
                          'You do not currently own any lists.\n\nPlease create a list by visiting our beloved *List Management* using the /lists command :)!',
                          parse_mode="Markdown",
                          )
+
+
+def show_lists_to_select(msg):
+    show_lists_to('select', msg)
+    return
+
+
+def show_lists_to_delete(msg):
+    show_lists_to('delete', msg)
+    return
 
 
 def show_lists(msg):
@@ -157,26 +174,54 @@ def show_lists(msg):
     zv_user = find_connected_zv_user(msg)
     owned_lists = get_all_lists(zv_user)
 
-    list_output_string = ""
+    lists_output_string = ""
     list_count = 0
 
     for list in owned_lists:
         if list['description'] is not None:
-            list_output_string += "Title: {}\nDescription: {}\n\n".format(
+            lists_output_string += "Title: {}\nDescription: {}\n\n".format(
                 list['title'], list['description'])
         else:
-            list_output_string += "Title: {}\n\n".format(list['title'])
+            lists_output_string += "Title: {}\n\n".format(list['title'])
         list_count += 1
 
     if list_count > 0:
         bot.send_message(msg.chat.id,
                          'You are currently the owner of the following {} list(s):\n\n_{}_'.format(
                              list_count,
-                             list_output_string),
+                             lists_output_string),
                          parse_mode="Markdown")
     else:
         bot.send_message(msg.chat.id,
                          'You do not currently own any lists.\n\nPlease create a list by visiting our beloved *List Management* using the /lists command :)!',
+                         parse_mode="Markdown",
+                         )
+
+
+def show_tasks(msg, list_id):
+    zv_user = find_connected_zv_user(msg)
+    existing_tasks = get_all_tasks(zv_user, list_id)
+
+    tasks_output_string = ""
+    task_count = 0
+
+    for task in existing_tasks:
+        if task['description'] is not None:
+            tasks_output_string += "Title: {}\nDescription: {}\n\n".format(
+                task['title'], task['description'])
+        else:
+            tasks_output_string += "Title: {}\n\n".format(task['title'])
+        task_count += 1
+
+    if task_count > 0:
+        bot.send_message(msg.chat.id,
+                         'There are currently the following {} task(s) within the selected list:\n\n_{}_'.format(
+                             task_count,
+                             tasks_output_string),
+                         parse_mode="Markdown")
+    else:
+        bot.send_message(msg.chat.id,
+                         'There are currently no tasks part of the selected list.\n\nPlease add a task to the selected list by visiting our beloved *Task Management* by using the /lists command and selecting a list from there :)!',
                          parse_mode="Markdown",
                          )
 

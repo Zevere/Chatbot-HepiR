@@ -2,9 +2,16 @@ import requests
 from properties import BORZOO_ROOT_URL
 
 
-def get_list_by_id(list_id):
-    # TODO implement this func when the feature has been implemented in the BORZOO graphql api
-    pass
+def get_list_by_id(zv_user, list_id):
+    owned_lists = get_all_lists(zv_user)
+    for list in owned_lists:
+        if list['id'] == list_id:
+            print('get_list_by_id')
+            print('FOUND\nlist with id={} belonging to the connected user={}'.format(
+                list_id, zv_user))
+            print(list)
+            return list
+    return None
 
 
 def create_list(zv_user, list_title, list_description):
@@ -34,6 +41,8 @@ def create_list(zv_user, list_title, list_description):
     owned_lists = get_all_lists(zv_user)
     for list in owned_lists:
         if list['id'] == list_id:
+            print('list with id={} already exists for the connected_user({})\nThe list will not be created.'.format(
+                list_id, zv_user))
             return False, None
 
     # if reached here, means list does not already exist for this zv_user

@@ -9,6 +9,15 @@ def is_authenticated(zv_user, tg_id):
     pass
 
 
+def get_authenticated_zvuser(tg_id):
+    found_connection = user_collection.find_one({'tg_id': str(tg_id)})
+    print('get_authenticated_zvuser')
+    print('found_connection for tg_id={} is {}'.format(tg_id, found_connection))
+    if found_connection:
+        return found_connection.get('zv_user')
+    return None
+
+
 # optional params, will not be used in testing
 def connect(zv_user, tg_id, first_name="He/She", bot=None, msg=None):
     # check if zv_user already exists; duplicate users results in 503 error from VIVID API

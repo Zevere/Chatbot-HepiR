@@ -8,6 +8,10 @@ from hepir_logging import (
 from authentication import(
     connect,
     disconnect,
+    get_authenticated_zvuser,
+)
+from list_management import(
+    get_list_by_id,
 )
 
 # Flask Routes ------------------------------------------------------------------------------------------
@@ -22,6 +26,8 @@ from helper_methods import(
     remove_reply_keyboard,
     delete_list_confirm_btn_clicked,
     init,
+    show_lists_to_select,
+    show_tasks,
 )
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
@@ -46,11 +52,11 @@ def callback_query(call):
         show_lists_to_delete(call.message)
 
     elif call.data == "cb_selectList":
-        bot.answer_callback_query(call.id,
-                                  "Select a List is not implemented yet...Please wait for the next release! ε=ε=ε=┌(;*´Д`)ﾉ")
+        bot.answer_callback_query(call.id, "Please select a list to select :)")
+        show_lists_to_select(call.message)
 
     else:
-        # delete a list e.g. cb_dlist_listid
+        # delete a list e.g. cb_dlist_<listid>
         if call.data.find('cb_dlist_') != -1:
             selected_list_id = call.data[len('cb_dlist_'):]
             bot.answer_callback_query(
@@ -60,6 +66,20 @@ def callback_query(call):
                                         selected_list_id),
                                     parse_mode="Markdown",
                                     reply_markup=confirm_delete_list_markup(selected_list_id))
+
+        # selected a list to see more details e.g. tasks within the list
+        elif call.data.find('cb_slist_') != -1:
+            selected_list_id = call.data[len('cb_slist_'):]
+            connected_user = get_authenticated_zvuser(call.message.chat.id)
+            selected_list = get_list_by_id(connected_user, selected_list_id)
+
+            bot.answer_callback_query(
+                call.id, "You clicked on the list with id={}".format(selected_list_id))
+            bot.send_message(call.message.chat.id,
+                             "{}\n*Task Management*\n{}\nWelcome to the Task Management Screen!\n\nYou have selected the list with the title of `{}`\n\nHere you will be able to view all of the tasks associated with this list, add new tasks to this list, delete tasks from this list.\n\nWhat would you like to do on this blessed day ☜(⌒▽⌒)☞?".format(
+                                 '-'*23, '-'*23, selected_list['title']),
+                             parse_mode="Markdown",
+                             reply_markup=task_management_markup(selected_list_id))
 
         # confirm delete list
         elif call.data.find('cb_ydlst_') != -1:
@@ -90,13 +110,19 @@ def callback_query(call):
             bot.register_next_step_handler(
                 sent, handle_create_list_description_force_reply, list_title)
 
-        # reject delete list
+        # reject create list
         elif call.data.find('cb_nclst_') != -1:
             bot.answer_callback_query(call.id, "Cancelled Action")
             remove_reply_keyboard(bot, call)
             bot.send_message(
                 call.message.chat.id, "Okay, the list was not created.\nHow may I help you today?")
             # TODO return markup k/b with buttons for each of the /commands
+
+        # view tasks within the selected list
+        elif call.data.find('cb_vwtsk_') != -1:
+            selected_list_id = call.data[len('cb_vwtsk_'):]
+            bot.answer_callback_query(call.id, "Here are your tasks ᕙ(⇀‸↼‶)ᕗ")
+            show_tasks(call.message, selected_list_id)
 
         else:
             bot.answer_callback_query(
@@ -108,7 +134,8 @@ def list_management(msg):
     log_command_info('/lists', msg)
 
     bot.send_message(msg.chat.id,
-                     "------------------------------\n*List Management*\n------------------------------\nWelcome to the List Management Screen!\n\nHere you are able to create new lists, view all of your lists, delete and existing list, and select a list to view its list items and/or add new tasks to the list.\n\nWhat would you like to do on this blessed day ٩(⁎❛ᴗ❛⁎)۶?",
+                     "{}\n*List Management*\n{}\nWelcome to the List Management Screen!\n\nHere you are able to create new lists, view all of your lists, delete an existing list, and select a list to view its list items and/or add new tasks to the list.\n\nWhat would you like to do on this blessed day ٩(⁎❛ᴗ❛⁎)۶?".format(
+                         '-'*23, '-'*23),
                      parse_mode="Markdown",
                      reply_markup=list_management_markup())
     return
