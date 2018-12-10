@@ -164,14 +164,6 @@ class TestListManagmement(object):
 #     # should return null for non existant zevere users
 #     assert get_all_tasks(INVALID_ZEVERE_USER, VALID_LIST_ID) is None
 
-#     def test_get_task_by_id(self):
-#         # try to get the task we created in the above test case
-#         result = get_task_by_id(VALID_TASK_ID)
-#         assert result['id'] == VALID_TASK_ID
-
-#         # try to get a non existent task
-#         assert get_task_by_id(INVALID_TASK_ID) is None
-
 #     def test_delete_task(self):
 #         # trying to delete a task not part of the list passed
 #         # in as an argument should return False and None as no
