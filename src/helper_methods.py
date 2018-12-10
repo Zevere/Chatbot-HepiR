@@ -12,6 +12,7 @@ from list_management import (
 
 from task_management import(
     get_all_tasks,
+    create_task,
 )
 
 
@@ -39,6 +40,10 @@ def convert_list_title_to_id(list_title):
     return list_title.strip().lower().replace(' ', '_')
 
 
+def convert_task_title_to_id(task_title):
+    return convert_list_title_to_id(task_title)
+
+
 def handle_create_list_description_force_reply(msg, list_title):
     list_description = msg.text
 
@@ -46,11 +51,7 @@ def handle_create_list_description_force_reply(msg, list_title):
         list_description = None
 
     zv_user = find_connected_zv_user(msg)
-
-    # if list_description is not None:
     create_list_results = create_list(zv_user, list_title, list_description)
-    # else:
-    # create_list_results = create_list(zv_user, list_title)
 
     if create_list_results[0]:
         bot.send_message(msg.chat.id,
@@ -58,6 +59,37 @@ def handle_create_list_description_force_reply(msg, list_title):
                              list_title, zv_user,
                              '\nList Description: _{}_'.format(
                                  list_description) if list_description is not None else ''
+                         ),
+                         parse_mode="Markdown"
+                         )
+    else:
+        bot.send_message(msg.chat.id,
+                         'An error has occured and the list was not created.',
+                         parse_mode="Markdown",)
+
+    return
+
+
+def handle_create_task_description_force_reply(msg, task_title):
+    task_description = msg.text
+
+    if task_description == 'no':
+        task_description = None
+
+    zv_user = find_connected_zv_user(msg)
+    selected_list_id = user_collection.find_one(
+        {'zv_user': str(zv_user)}).get('selected_list_id')
+    create_task_results = create_task(
+        zv_user, selected_list_id, task_title, task_description)
+
+    if create_task_results[0]:
+        bot.send_message(msg.chat.id,
+                         'Thank you for your input dear.\n\nYour new task has been successfully created with the following details:\n\nTask Title: _{}_\nList Owner: _{}_\nList: _{}_{}'.format(
+                             task_title, zv_user,
+                             get_list_by_id(zv_user, selected_list_id)[
+                                 'title'],
+                             '\nTask Description: _{}_'.format(
+                                 task_description) if task_description is not None else ''
                          ),
                          parse_mode="Markdown"
                          )
@@ -101,6 +133,44 @@ def handle_create_list_id_force_reply(msg):
     else:
         bot.send_message(msg.chat.id,
                          'Your title is too long!The maximum number of characters permitted for a list title is 55 characters.\n\nYour list title exceeded this amount by *{}* characters.\n\nPlease return to List Management (/lists) and try again with a different title :)'.format(
+                             abs(leftover_char_limit)),
+                         parse_mode="Markdown"
+                         )
+    return
+
+
+def handle_create_task_id_force_reply(msg, zv_user, list_id):
+    """Solicits task title from user, then prompts user for task creation confirmation.
+    """
+    task_title = msg.text
+    task_id = convert_list_title_to_id(task_title)
+    print('\task_title={}\nlist_id={}'.format(task_title, task_id))
+    print('len of the task_id={}\nValid len id={}\n'.format(
+        len(task_id), is_valid_id_len(task_id)[0]))
+
+    within_bounds, leftover_char_limit = is_valid_id_len(task_id)
+
+    if within_bounds:
+        # check that the list does not already contain the task that the user is trying to add
+        existing_tasks = get_all_tasks(zv_user, list_id)
+
+        for task in existing_tasks:
+            if task['id'] == task_id:
+                bot.send_message(msg.chat.id, 'Your selected list already contains a task created with the title of _{}_!\n\nYou cannot add duplicate tasks with the same title in Zevere.\n\nPlease try again with a different name :)!'.format(
+                    task_title),
+                    parse_mode="Markdown"
+                )
+                return
+
+        bot.send_message(msg.chat.id,
+                         'Are you sure you want to `add` this task to the selected list?\n\nYour new task will have a title of _{}_'.format(
+                             task_title),
+                         parse_mode="Markdown",
+                         reply_markup=confirm_create_task_markup(task_title)
+                         )
+    else:
+        bot.send_message(msg.chat.id,
+                         'Your title is too long!The maximum number of characters permitted for a task title is 55 characters.\n\nYour task title exceeded this amount by *{}* characters.\n\nPlease return to Task Management (/lists and selecting your list) and try again with a different title :)'.format(
                              abs(leftover_char_limit)),
                          parse_mode="Markdown"
                          )

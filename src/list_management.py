@@ -19,8 +19,8 @@ def create_list(zv_user, list_title, list_description):
 
     Keyword arguments:
     zv_user - the user id of the Zevere user
-    list_title - the title of the list to be deleted
-    list_description - Optional; the description of the list to be deleted
+    list_title - the title of the list to be created
+    list_description - Optional; the description of the list to be created
 
     Returns:
         True, list id   - upon successful creation

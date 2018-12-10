@@ -28,6 +28,8 @@ from helper_methods import(
     init,
     show_lists_to_select,
     show_tasks,
+    handle_create_task_id_force_reply,
+    handle_create_task_description_force_reply,
 )
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
@@ -73,6 +75,19 @@ def callback_query(call):
             connected_user = get_authenticated_zvuser(call.message.chat.id)
             selected_list = get_list_by_id(connected_user, selected_list_id)
 
+            # Need to update hepir db to store the currently selected list
+            # because of limitation of 64 characters, won't be able to pass in
+            # list id and task id in callback data later when creating a task
+            # or deleting a task
+            user_collection.update_one(
+                {'tg_id': str(call.message.chat.id)},
+                {
+                    "$set": {
+                        "selected_list_id": selected_list_id,
+                    }
+                }
+            )
+
             bot.answer_callback_query(
                 call.id, "You clicked on the list with id={}".format(selected_list_id))
             bot.send_message(call.message.chat.id,
@@ -99,16 +114,16 @@ def callback_query(call):
 
         # confirm create list
         elif call.data.find('cb_yclst_') != -1:
-            list_title = call.data[len('cb_yclst_'):]
+            task_title = call.data[len('cb_yclst_'):]
             bot.answer_callback_query(
-                call.id, "You confirmed to create the list with title of {}".format(list_title))
+                call.id, "You confirmed to create the list with title of {}".format(task_title))
             remove_reply_keyboard(bot, call)
             sent = bot.send_message(
                 call.message.chat.id, 'Great! Thank you for confirming.\nThat is a fantastic title for your new list 8D!\n\nWould you like to add a description to your newly created list?\n\nIf you would not like to add a description, please kindly reply *no*:',
                 parse_mode='Markdown',
                 reply_markup=telebot.types.ForceReply())
             bot.register_next_step_handler(
-                sent, handle_create_list_description_force_reply, list_title)
+                sent, handle_create_list_description_force_reply, task_title)
 
         # reject create list
         elif call.data.find('cb_nclst_') != -1:
@@ -119,10 +134,44 @@ def callback_query(call):
             # TODO return markup k/b with buttons for each of the /commands
 
         # view tasks within the selected list
-        elif call.data.find('cb_vwtsk_') != -1:
-            selected_list_id = call.data[len('cb_vwtsk_'):]
+        elif call.data.find('cb_vtask_') != -1:
+            selected_list_id = call.data[len('cb_vtask_'):]
             bot.answer_callback_query(call.id, "Here are your tasks ᕙ(⇀‸↼‶)ᕗ")
             show_tasks(call.message, selected_list_id)
+
+        # add a task to the selected list
+        elif call.data.find('cb_atask_') != -1:
+            selected_list_id = call.data[len('cb_atask_'):]
+            connected_user = get_authenticated_zvuser(call.message.chat.id)
+            # selected_list = get_list_by_id(connected_user, selected_list_id)
+
+            bot.answer_callback_query(call.id, "Let's create a new task \o/!!")
+            sent = bot.send_message(
+                call.message.chat.id, 'Please enter in the title of your new task:', reply_markup=telebot.types.ForceReply())
+            bot.register_next_step_handler(
+                sent, handle_create_task_id_force_reply, connected_user, selected_list_id)
+
+        # confirm create task
+        elif call.data.find('cb_yatsk_') != -1:
+            task_title = call.data[len('cb_yatsk_'):]
+            bot.answer_callback_query(
+                call.id, "You confirmed to add the task with title of {}".format(task_title))
+            remove_reply_keyboard(bot, call)
+            sent = bot.send_message(
+                call.message.chat.id, 'Great! Thank you for confirming.\nThat is a fantastic title for your new task 8D!\n\nWould you like to add a description to your newly created task?\n\nIf you would not like to add a description, please kindly reply *no*:',
+                parse_mode='Markdown',
+                reply_markup=telebot.types.ForceReply())
+
+            bot.register_next_step_handler(
+                sent, handle_create_task_description_force_reply, task_title)
+
+        # reject create task
+        elif call.data.find('cb_natsk_') != -1:
+            bot.answer_callback_query(call.id, "Cancelled Action")
+            remove_reply_keyboard(bot, call)
+            bot.send_message(
+                call.message.chat.id, "Okay, the task was not created.\nHow may I help you today?")
+            # TODO return markup k/b with buttons for each of the /commands
 
         else:
             bot.answer_callback_query(

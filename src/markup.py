@@ -26,11 +26,11 @@ def task_management_markup(selected_list_id):
     markup.row_width = 1
     markup.add(
         InlineKeyboardButton("View all tasks in the list",
-                             callback_data='cb_vwtsk_{}'.format(selected_list_id)),
+                             callback_data='cb_vtask_{}'.format(selected_list_id)),
         InlineKeyboardButton("Add a new task to the list",
-                             callback_data='cb_adtsk_{}'.format(selected_list_id)),
+                             callback_data='cb_atask_{}'.format(selected_list_id)),
         InlineKeyboardButton("Delete an existing task from the list",
-                             callback_data='cb_detsk_{}'.format(selected_list_id)),
+                             callback_data='cb_dtask_{}'.format(selected_list_id)),
         InlineKeyboardButton("Choose another list",
                              callback_data="cb_selectList"),
     )
@@ -86,5 +86,17 @@ def confirm_create_list_markup(list_title):
             'Yes', callback_data='cb_yclst_{}'.format(list_title)),
         InlineKeyboardButton(
             'No', callback_data='cb_nclst_{}'.format(list_title)),
+    )
+    return markup
+
+
+def confirm_create_task_markup(task_title):
+    markup = InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        InlineKeyboardButton(
+            # callback_data headers must be 9 length in this app's design
+            'Yes', callback_data='cb_yatsk_{}'.format(task_title)),
+        InlineKeyboardButton(
+            'No', callback_data='cb_natsk_{}'.format(task_title)),
     )
     return markup

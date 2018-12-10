@@ -1,6 +1,7 @@
 from test_properties import *
 from authentication import connect, disconnect, get_authenticated_zvuser
 from list_management import create_list, get_all_lists, delete_list, get_list_by_id
+from task_management import get_all_tasks, create_task
 
 
 class TestAuthentication(object):
@@ -65,14 +66,14 @@ class TestAuthentication(object):
 
 
 class TestListManagmement(object):
-     # TEST ENV SETUP
-    # make sure the valid account is logged in first before trying to logout with the account
-    print('*'*50)
-    print('TEST ENVIRONMENT SETUP')
-    print(connect(*VALID_ZV_CONNECTION)[1])
-    print('*'*50)
-
     def test_create_list(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first
+        print('*'*50)
+        print('TEST ENVIRONMENT SETUP')
+        print(connect(*VALID_ZV_CONNECTION)[1])
+        print('*'*50)
+
         # create new list for the zevere user
         # should return the id of the list which is the list title
         # toLower and spaces replaced with underscore characters
@@ -85,6 +86,13 @@ class TestListManagmement(object):
                            LIST_TITLE, LIST_DESCRIPTION) == (False, None)
 
     def test_get_all_lists(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first
+        print('*'*50)
+        print('TEST ENVIRONMENT SETUP')
+        print(connect(*VALID_ZV_CONNECTION)[1])
+        print('*'*50)
+
         # returns list of lists for existant zevere user
         assert type(get_all_lists(VALID_ZEVERE_USER)) == list
 
@@ -92,6 +100,13 @@ class TestListManagmement(object):
         assert get_all_lists(INVALID_ZEVERE_USER) is None
 
     def test_get_list_by_id(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first
+        print('*'*50)
+        print('TEST ENVIRONMENT SETUP')
+        print(connect(*VALID_ZV_CONNECTION)[1])
+        print('*'*50)
+
         # try to get the list we created in the above test case
         result = get_list_by_id(VALID_ZEVERE_USER, VALID_LIST_ID)
         assert result['id'] == VALID_LIST_ID
@@ -100,6 +115,13 @@ class TestListManagmement(object):
         assert get_list_by_id(VALID_ZEVERE_USER, INVALID_LIST_ID) is None
 
     def test_delete_list(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first
+        print('*'*50)
+        print('TEST ENVIRONMENT SETUP')
+        print(connect(*VALID_ZV_CONNECTION)[1])
+        print('*'*50)
+
         # trying to delete a list not owned by the zv_user passed
         # in as an argument should return False and None as no
         # list was deleted
@@ -117,52 +139,52 @@ class TestListManagmement(object):
             True, VALID_LIST_AND_OWNER[1])
 
 
-# class TestTaskManagement(object):
-#     # TEST ENV SETUP
-#     # make sure the valid account is logged in first before trying to logout with the account
-#     print('*'*50)
-#     print('TEST ENVIRONMENT SETUP')
-#     print(connect(*VALID_ZV_CONNECTION)[1])
-#     print('The list with id = {} was successfully created'.format(
-#         create_list(VALID_ZEVERE_USER, LIST_TITLE, LIST_DESCRIPTION)))
-#     print('*'*50)
+class TestTaskManagement(object):
+    def test_create_task(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first before trying to logout with the account
+        print('*'*50)
+        print('TEST ENVIRONMENT SETUP')
+        print(connect(*VALID_ZV_CONNECTION)[1])
+        print('The list with id = {} was successfully created'.format(
+            create_list(VALID_ZEVERE_USER, LIST_TITLE, LIST_DESCRIPTION)))
+        print('*'*50)
 
-#     def test_create_task(self):
-#         # create new task for the zevere user for an existing list
-#         # should return the id of the task which is the task title
-#         # toLower and spaces replaced with underscore characters
-#         assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID, TASK_TITLE,
-#                            TASK_DESCRIPTION) == (True, TASK_TITLE.strip().lower().replace(' ', '_'))
+        # create new task for the zevere user for an existing list
+        # should return the id of the task which is the task title
+        # toLower and spaces replaced with underscore characters
+        # assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID, TASK_TITLE,
+        #                    TASK_DESCRIPTION) == (True, TASK_TITLE.strip().lower().replace(' ', '_'))
 
-#         # creating a task that already exists for the zevere user's list
-#         # should return None since the task is not created again
-#         assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID,
-#                            TASK_TITLE, TASK_DESCRIPTION) == (False, None)
+        # creating a task that already exists for the zevere user's list
+        # should return None since the task is not created again
+        assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID,
+                           TASK_TITLE, TASK_DESCRIPTION) == (False, None)
 
-#         # creating a task for a non-existent list
-#         # should return None since the task cannot be created
-#         assert create_task(VALID_ZEVERE_USER, INVALID_LIST_ID,
-#                            TASK_TITLE, TASK_DESCRIPTION) == (False, None)
+        # creating a task for a non-existent list
+        # should return None since the task cannot be created
+        assert create_task(VALID_ZEVERE_USER, INVALID_LIST_ID,
+                           TASK_TITLE, TASK_DESCRIPTION) == (False, None)
 
-#         # creating a task for a list not belonging to the connected zevere user
-#         # should return None since the task will not be created
-#         assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID2,
-#                            TASK_TITLE, TASK_DESCRIPTION) == (False, None)
+        # creating a task for a list not belonging to the connected zevere user
+        # should return None since the task will not be created
+        assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID2,
+                           TASK_TITLE, TASK_DESCRIPTION) == (False, None)
 
-#         # creating a list with an invalid zevere user
-#         # should return None since the list is not created
-#         assert create_task(INVALID_ZEVERE_USER, VALID_LIST_ID,
-#                            LIST_TITLE, LIST_DESCRIPTION) == (False, None)
+        # creating a list with an invalid zevere user
+        # should return None since the list is not created
+        assert create_task(INVALID_ZEVERE_USER, VALID_LIST_ID,
+                           LIST_TITLE, LIST_DESCRIPTION) == (False, None)
 
-# def test_get_all_tasks(self):
-#     # returns list of tasks for existant zevere user and his/her owned list
-#     assert type(get_all_tasks(VALID_ZEVERE_USER, VALID_LIST_ID)) == list
+    def test_get_all_tasks(self):
+        # returns list of tasks for existant zevere user and his/her owned list
+        assert type(get_all_tasks(VALID_ZEVERE_USER, VALID_LIST_ID)) == list
 
-#     # should return null for existant zevere user but an unknown list
-#     assert get_all_tasks(VALID_ZEVERE_USER, INVALID_LIST_ID) is None
+        # should return null for existant zevere user but an unknown list
+        assert get_all_tasks(VALID_ZEVERE_USER, INVALID_LIST_ID) is None
 
-#     # should return null for non existant zevere users
-#     assert get_all_tasks(INVALID_ZEVERE_USER, VALID_LIST_ID) is None
+        # should return null for non existant zevere users
+        assert get_all_tasks(INVALID_ZEVERE_USER, VALID_LIST_ID) is None
 
 #     def test_delete_task(self):
 #         # trying to delete a task not part of the list passed
@@ -181,9 +203,9 @@ class TestListManagmement(object):
 #         assert delete_list(*VALID_LIST_AND_OWNER, VALID_TASK_ID) == (
 #             True, VALID_TASK_ID)
 
-    # print('*'*50)
-    # print('TEST ENVIRONMENT CLEANUP')
-    # print('The list with id = {} was successfully deleted'.format(
-    #     delete_list(*VALID_LIST_AND_OWNER)[1]))
-    # print(disconnect(*VALID_ZV_CONNECTION)[1])
-    # print('*'*50)
+        print('*'*50)
+        print('TEST ENVIRONMENT CLEANUP')
+        print('The list with id = {} was successfully deleted'.format(
+            delete_list(*VALID_LIST_AND_OWNER)[1]))
+        # print(disconnect(*VALID_ZV_CONNECTION)[1])
+        print('*'*50)
