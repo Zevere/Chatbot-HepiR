@@ -29,6 +29,42 @@ def get_all_tasks(zv_user, list_id):
     return existing_tasks
 
 
+def delete_task(zv_user, list_id, task_id):
+    """Deletes a selected task for the connected user from the selected list.
+
+    Keyword arguments:
+    zv_user - the user id of the Zevere user
+    list_id - the id of the list where this task will be deleted from
+    task_id - the id of the task to be deleted
+
+    Returns:
+        True, task_id   - upon successful deletion of task
+        False, None     - upon failure
+    """
+    print(
+        '\nDELETION DETAILS\nAttempting to delete task ({}) from the selected list ({}) of connected user ({})\n'.format(
+            task_id, list_id, zv_user)
+    )
+
+    response = requests.post('{}/zv/graphql'.format(BORZOO_ROOT_URL),
+                             json={
+        "query": "mutation {deleteTask(ownerId: \"" + zv_user + "\" listId: \"" + list_id + "\" taskId: \"" + task_id + "\")}"
+    },
+        headers={'Content-Type': 'application/json'})
+
+    if response.status_code == 200:
+        response = response.json()
+        print('\ncreate_task\nresponse: {}\n'.format(response))
+
+        # invalid list id or task id
+        if response['data']['deleteTask'] is None:
+            return False, None
+        return True, task_id
+    else:
+        # borzoo is offline
+        return False, None
+
+
 def create_task(zv_user, list_id, task_title, task_description):
     """Creates a task for this Zevere user under the list which has list_id.
 

@@ -1,7 +1,7 @@
 from test_properties import *
 from authentication import connect, disconnect, get_authenticated_zvuser
 from list_management import create_list, get_all_lists, delete_list, get_list_by_id
-from task_management import get_all_tasks, create_task
+from task_management import get_all_tasks, create_task, delete_task
 
 
 class TestAuthentication(object):
@@ -186,22 +186,22 @@ class TestTaskManagement(object):
         # should return null for non existant zevere users
         assert get_all_tasks(INVALID_ZEVERE_USER, VALID_LIST_ID) is None
 
-#     def test_delete_task(self):
-#         # trying to delete a task not part of the list passed
-#         # in as an argument should return False and None as no
-#         # task was deleted
-#         assert delete_task(*VALID_LIST_AND_OWNER, VALID_TASK_ID2) == (
-#             False, None)
+    def test_delete_task(self):
+        # trying to delete a task not part of the list passed
+        # in as an argument should return False and None as no
+        # task was deleted
+        assert delete_task(*VALID_LIST_AND_OWNER, VALID_TASK_ID2) == (
+            False, None)
 
-#         # trying to delete a task by an id that does not exist
-#         # should return False and None as no list was deleted
-#         assert delete_list(*INVALID_OWNER_AND_LIST, INVALID_TASK_ID) == (
-#             False, None)
+        # trying to delete a task by an id that does not exist
+        # should return False and None as no list was deleted
+        assert delete_task(*INVALID_OWNER_AND_LIST, INVALID_TASK_ID) == (
+            False, None)
 
-#         # trying to delete a task part of the list owned by th zv_user passed
-#         # in as an argument should return True and the id of the list that was deleted
-#         assert delete_list(*VALID_LIST_AND_OWNER, VALID_TASK_ID) == (
-#             True, VALID_TASK_ID)
+        # trying to delete a task part of the list owned by th zv_user passed
+        # in as an argument should return True and the id of the list that was deleted
+        assert delete_task(*VALID_LIST_AND_OWNER, VALID_TASK_ID) == (
+            True, VALID_TASK_ID)
 
         print('*'*50)
         print('TEST ENVIRONMENT CLEANUP')

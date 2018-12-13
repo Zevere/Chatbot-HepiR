@@ -30,6 +30,8 @@ from helper_methods import(
     show_tasks,
     handle_create_task_id_force_reply,
     handle_create_task_description_force_reply,
+    show_tasks_to_delete,
+    delete_task_confirm_btn_clicked,
 )
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
@@ -143,13 +145,46 @@ def callback_query(call):
         elif call.data.find('cb_atask_') != -1:
             selected_list_id = call.data[len('cb_atask_'):]
             connected_user = get_authenticated_zvuser(call.message.chat.id)
-            # selected_list = get_list_by_id(connected_user, selected_list_id)
 
             bot.answer_callback_query(call.id, "Let's create a new task \o/!!")
             sent = bot.send_message(
                 call.message.chat.id, 'Please enter in the title of your new task:', reply_markup=telebot.types.ForceReply())
             bot.register_next_step_handler(
                 sent, handle_create_task_id_force_reply, connected_user, selected_list_id)
+
+        # choose an existing task from the selected list to delete
+        elif call.data.find('cb_dptsk_') != -1:
+            selected_list_id = call.data[len('cb_dptsk_'):]
+            bot.answer_callback_query(
+                call.id, "Please select a list to delete :)")
+            show_tasks_to_delete(call.message, selected_list_id)
+
+        # delete a task e.g. cb_dtask_<taskid>
+        elif call.data.find('cb_dtask_') != -1:
+            selected_task_id = call.data[len('cb_dtask_'):]
+            bot.answer_callback_query(
+                call.id, "You clicked on the task with id={}".format(selected_task_id))
+            sent = bot.send_message(call.message.chat.id,
+                                    'Are you sure you want to `delete` this task from the selected list?\nTask with id of *{}*'.format(
+                                        selected_task_id),
+                                    parse_mode="Markdown",
+                                    reply_markup=confirm_delete_task_markup(selected_task_id))
+
+        # confirm delete task
+        elif call.data.find('cb_ydtsk_') != -1:
+            selected_task_id = call.data[len('cb_ydtsk_'):]
+            bot.answer_callback_query(
+                call.id, "You confirmed to delete the task with id={} from the selected list.".format(selected_task_id))
+            remove_reply_keyboard(bot, call)
+            delete_task_confirm_btn_clicked(call.message, selected_task_id)
+
+        # reject delete task
+        elif call.data.find('cb_ndtsk_') != -1:
+            bot.answer_callback_query(call.id, "Cancelled Action")
+            remove_reply_keyboard(bot, call)
+            bot.send_message(
+                call.message.chat.id, "Okay, the task was not deleted from the selected list.\nHow may I help you today?", reply_markup=telebot.types.ReplyKeyboardRemove())
+            # TODO return markup k/b with buttons for each of the /commands
 
         # confirm create task
         elif call.data.find('cb_yatsk_') != -1:

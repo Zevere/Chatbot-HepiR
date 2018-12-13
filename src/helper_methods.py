@@ -3,6 +3,7 @@ from properties import *
 import datetime
 from markup import *
 from pprint import pprint
+
 from list_management import (
     create_list,
     get_all_lists,
@@ -13,6 +14,7 @@ from list_management import (
 from task_management import(
     get_all_tasks,
     create_task,
+    delete_task,
 )
 
 
@@ -193,6 +195,28 @@ def delete_list_confirm_btn_clicked(msg, list_id):
                          parse_mode="Markdown",)
 
 
+def delete_task_confirm_btn_clicked(msg, task_id):
+    zv_user = find_connected_zv_user(msg)
+    selected_list_id = user_collection.find_one(
+        {'zv_user': str(zv_user)}).get('selected_list_id')
+
+    print('\n\nTrying to delete task with id = {} from selected list with id = {}\n'.format(
+        task_id, selected_list_id))
+
+    delete_task_results = delete_task(zv_user, selected_list_id, task_id)
+
+    if(delete_task_results[0]):
+        bot.send_message(msg.chat.id,
+                         'The task with the id `{}` was successfully deleted.'.format(
+                             delete_task_results[1]),
+                         parse_mode="Markdown",)
+    else:
+        bot.send_message(msg.chat.id,
+                         'An error has occured and the task was not deleted.',
+                         parse_mode="Markdown",)
+    return
+
+
 def find_connected_zv_user(msg):
     """Gets the zevere user account connected to this telegram user.
 
@@ -264,6 +288,23 @@ def show_lists(msg):
     else:
         bot.send_message(msg.chat.id,
                          'You do not currently own any lists.\n\nPlease create a list by visiting our beloved *List Management* using the /lists command :)!',
+                         parse_mode="Markdown",
+                         )
+
+
+def show_tasks_to_delete(msg, list_id):
+    zv_user = find_connected_zv_user(msg)
+    existing_tasks = get_all_tasks(zv_user, list_id)
+    if len(existing_tasks) > 0:
+        bot.send_message(msg.chat.id,
+                         'Please click on the task you wish to `delete`:',
+                         parse_mode="Markdown",
+                         reply_markup=delete_task_markup(
+                             existing_tasks)
+                         )
+    else:
+        bot.send_message(msg.chat.id,
+                         'There are currently no tasks part of the selected list.\n\nPlease add a task to the selected list by visiting our beloved *Task Management* by using the /lists command and selecting a list from there :)!',
                          parse_mode="Markdown",
                          )
 
