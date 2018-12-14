@@ -4,15 +4,16 @@ from pprint import pprint
 import datetime
 
 
-def is_authenticated(zv_user, tg_id):
-    # TODO
-    pass
+def is_authenticated(tg_id):
+    """Used to enforce authentication. Returns true if the current telegram user is connected to an existing Zevere account, false otherwise.
+    """
+    return get_authenticated_zvuser(tg_id) is not None
 
 
 def get_authenticated_zvuser(tg_id):
     found_connection = user_collection.find_one({'tg_id': str(tg_id)})
     print('get_authenticated_zvuser')
-    print('found_connection for tg_id={} is {}'.format(tg_id, found_connection))
+    print('\tfound_connection for tg_id={} is {}'.format(tg_id, found_connection))
     if found_connection:
         return found_connection.get('zv_user')
     return None

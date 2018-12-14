@@ -1,5 +1,5 @@
 from test_properties import *
-from authentication import connect, disconnect, get_authenticated_zvuser
+from authentication import connect, disconnect, get_authenticated_zvuser, is_authenticated
 from list_management import create_list, get_all_lists, delete_list, get_list_by_id
 from task_management import get_all_tasks, create_task, delete_task
 
@@ -21,18 +21,18 @@ class TestAuthentication(object):
         assert connect(*INVALID_ZV_CONNECTION) == (
             False, 'You have provided invalid login credentials.')
 
-    # def test_is_authenticated(self):
-    # TEST ENV SETUP
-    # make sure the valid account is logged in first before trying to logout with the account
-    # connect(*VALID_ZV_CONNECTION)
-    #     # test authentication for valid tg->zv connection
-    #     # should return True and the zv_user the tg user is auth'd as
-    #     assert is_authenticated(
-    #         *VALID_ZV_CONNECTION) == (True, VALID_ZV_CONNECTION[0])
+    def test_is_authenticated(self):
+        # TEST ENV SETUP
+        # make sure the valid account is logged in first before trying to logout with the account
+        connect(*VALID_ZV_CONNECTION)
 
-    #     # test authentication for invalid tg->zv connection
-    #     # should return False and None since tg user not auth'd
-    #     assert is_authenticated(*INVALID_ZV_CONNECTION) == (False, None)
+        # test authentication for valid tg->zv connection
+        # should return True and the zv_user the tg user is auth'd as
+        assert is_authenticated(VALID_TG_ID) == True
+
+        # test authentication for invalid tg->zv connection
+        # should return False and None since tg user not auth'd
+        assert is_authenticated(INVALID_TG_ID) == False
 
     def test_get_authenticated_zvuser(self):
         # TEST ENV SETUP

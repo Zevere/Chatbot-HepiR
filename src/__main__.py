@@ -6,9 +6,9 @@ from hepir_logging import (
     log_received_text_msg,
 )
 from authentication import(
-    connect,
     disconnect,
     get_authenticated_zvuser,
+    is_authenticated,
 )
 from list_management import(
     get_list_by_id,
@@ -32,6 +32,7 @@ from helper_methods import(
     handle_create_task_description_force_reply,
     show_tasks_to_delete,
     delete_task_confirm_btn_clicked,
+    enforce_authentication,
 )
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
@@ -215,7 +216,13 @@ def callback_query(call):
 
 @bot.message_handler(commands=['lists'])
 def list_management(msg):
+
     log_command_info('/lists', msg)
+    try:
+        enforce_authentication(msg)
+    # if user not authenticated, will not allow continued execution of this method
+    except Exception:
+        return
 
     bot.send_message(msg.chat.id,
                      "{}\n*List Management*\n{}\nWelcome to the List Management Screen!\n\nHere you are able to create new lists, view all of your lists, delete an existing list, and select a list to view its list items and/or add new tasks to the list.\n\nWhat would you like to do on this blessed day ٩(⁎❛ᴗ❛⁎)۶?".format(
@@ -228,11 +235,16 @@ def list_management(msg):
 @bot.message_handler(commands=['me'])
 def get_profile(msg):
     log_command_info('/me', msg)
+    try:
+        enforce_authentication(msg)
+    # if user not authenticated, will not allow continued execution of this method
+    except Exception:
+        return
 
     # my tg id
     tg_id = msg.chat.id
 
-    # get zv_user of the connected account from the hepir db
+    # get zv_user of the 1ed account from the hepir db
     found_connection = user_collection.find_one({'tg_id': str(tg_id)})
 
     if found_connection:
@@ -269,6 +281,12 @@ def get_profile(msg):
 @bot.message_handler(commands=['logout'])
 def logout(msg):
     log_command_info('/logout', msg)
+    try:
+        enforce_authentication(msg)
+    # if user not authenticated, will not allow continued execution of this method
+    except Exception:
+        return
+
     tg_id = msg.chat.id
     found_connection = user_collection.find_one({'tg_id': str(tg_id)})
     zv_user = found_connection.get('zv_user')
@@ -327,7 +345,7 @@ def about(msg):
     log_command_info('/about', msg)
     bot.send_message(msg.chat.id,
                      "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!~\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
-                         VERSION, KNOWN_COMMANDS))
+                         VERSION, KNOWN_COMMANDS if is_authenticated(msg.chat.id) else NO_AUTH_KNOWN_COMMANDS))
     return
 
 

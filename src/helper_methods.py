@@ -4,6 +4,10 @@ import datetime
 from markup import *
 from pprint import pprint
 
+from authentication import (
+    is_authenticated,
+)
+
 from list_management import (
     create_list,
     get_all_lists,
@@ -16,6 +20,22 @@ from task_management import(
     create_task,
     delete_task,
 )
+
+
+# get tg_id from msg
+def enforce_authentication(msg):
+    print('Inside enforce_authentication')
+    # check if authenticated
+    if is_authenticated(msg.chat.id):
+        print('\ttg_id {} is authenticated!'.format(msg.chat.id))
+        # continues execution of attempted action
+        return
+    else:
+        print('\ttg_id {} is not authenticated!'.format(msg.chat.id))
+        # terminate further execution of the attempted action
+        bot.send_message(msg.chat.id, 'You are not logged into Zevere. Please login at {} and use the Login Widget provided on the Profile page after logging in :)!'.format(
+            COHERENT_ROOT_URL))
+        raise Exception
 
 
 def remove_reply_keyboard(tbot, cb_call):
