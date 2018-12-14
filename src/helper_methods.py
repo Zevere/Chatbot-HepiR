@@ -117,7 +117,7 @@ def handle_create_task_description_force_reply(msg, task_title):
                          )
     else:
         bot.send_message(msg.chat.id,
-                         'An error has occured and the list was not created.',
+                         'An error has occured and the task was not created.',
                          parse_mode="Markdown",)
 
     return
