@@ -54,10 +54,10 @@ def delete_task(zv_user, list_id, task_id):
 
     if response.status_code == 200:
         response = response.json()
-        print('\ncreate_task\nresponse: {}\n'.format(response))
+        print('\ndelete_task\nresponse: {}\n'.format(response))
 
         # invalid list id or task id
-        if response['data']['deleteTask'] is None:
+        if not response['data']['deleteTask']:
             return False, None
         return True, task_id
     else:

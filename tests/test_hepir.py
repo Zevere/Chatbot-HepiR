@@ -153,8 +153,8 @@ class TestTaskManagement(object):
         # create new task for the zevere user for an existing list
         # should return the id of the task which is the task title
         # toLower and spaces replaced with underscore characters
-        # assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID, TASK_TITLE,
-        #                    TASK_DESCRIPTION) == (True, TASK_TITLE.strip().lower().replace(' ', '_'))
+        assert create_task(VALID_ZEVERE_USER, VALID_LIST_ID, TASK_TITLE,
+                           TASK_DESCRIPTION) == (True, TASK_TITLE.strip().lower().replace(' ', '_'))
 
         # creating a task that already exists for the zevere user's list
         # should return None since the task is not created again
