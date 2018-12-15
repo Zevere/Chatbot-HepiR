@@ -25,7 +25,7 @@ from task_management import(
 
 def solicit_next_action(msg):
     bot.send_message(
-        msg.chat.id, 'How many I further service you today?', reply_markup=next_action_markup())
+        msg.chat.id, 'How may I further service you today?', reply_markup=next_action_markup())
     pass
 
 
