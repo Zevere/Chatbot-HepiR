@@ -33,6 +33,8 @@ from helper_methods import(
     show_tasks_to_delete,
     delete_task_confirm_btn_clicked,
     enforce_authentication,
+    solicit_next_action,
+    display_task_management,
 )
 
 # Telegram Bot Message Handlers --------------------------------------------------------------------------
@@ -45,6 +47,7 @@ def callback_query(call):
     if call.data == "cb_viewLists":
         bot.answer_callback_query(call.id, "Here are your lists \(ᵔᵕᵔ)/")
         show_lists(call.message)
+        solicit_next_action(call.message)
 
     elif call.data == "cb_createList":
         bot.answer_callback_query(call.id, "Let's create a new list \o/!!")
@@ -75,8 +78,8 @@ def callback_query(call):
         # selected a list to see more details e.g. tasks within the list
         elif call.data.find('cb_slist_') != -1:
             selected_list_id = call.data[len('cb_slist_'):]
-            connected_user = get_authenticated_zvuser(call.message.chat.id)
-            selected_list = get_list_by_id(connected_user, selected_list_id)
+            # connected_user = get_authenticated_zvuser(call.message.chat.id)
+            # selected_list = get_list_by_id(connected_user, selected_list_id)
 
             # Need to update hepir db to store the currently selected list
             # because of limitation of 64 characters, won't be able to pass in
@@ -93,11 +96,12 @@ def callback_query(call):
 
             bot.answer_callback_query(
                 call.id, "You clicked on the list with id={}".format(selected_list_id))
-            bot.send_message(call.message.chat.id,
-                             "{}\n*Task Management*\n{}\nWelcome to the Task Management Screen!\n\nYou have selected the list with the title of `{}`\n\nHere you will be able to view all of the tasks associated with this list, add new tasks to this list, delete tasks from this list.\n\nWhat would you like to do on this blessed day ☜(⌒▽⌒)☞?".format(
-                                 '-'*23, '-'*23, selected_list['title']),
-                             parse_mode="Markdown",
-                             reply_markup=task_management_markup(selected_list_id))
+            display_task_management(call.message)
+            # bot.send_message(call.message.chat.id,
+            #                  "{}\n*Task Management*\n{}\nWelcome to the Task Management Screen!\n\nYou have selected the list with the title of `{}`\n\nHere you will be able to view all of the tasks associated with this list, add new tasks to this list, delete tasks from this list.\n\nWhat would you like to do on this blessed day ☜(⌒▽⌒)☞?".format(
+            #                      '-'*23, '-'*23, selected_list['title']),
+            #                  parse_mode="Markdown",
+            #                  reply_markup=task_management_markup(selected_list_id))
 
         # confirm delete list
         elif call.data.find('cb_ydlst_') != -1:
@@ -112,8 +116,8 @@ def callback_query(call):
             bot.answer_callback_query(call.id, "Cancelled Action")
             remove_reply_keyboard(bot, call)
             bot.send_message(
-                call.message.chat.id, "Okay, the list was not deleted.\nHow may I help you today?", reply_markup=telebot.types.ReplyKeyboardRemove())
-            # TODO return markup k/b with buttons for each of the /commands
+                call.message.chat.id, "Okay, the list was not deleted.", reply_markup=telebot.types.ReplyKeyboardRemove())
+            list_management(call.message)
 
         # confirm create list
         elif call.data.find('cb_yclst_') != -1:
@@ -134,13 +138,14 @@ def callback_query(call):
             remove_reply_keyboard(bot, call)
             bot.send_message(
                 call.message.chat.id, "Okay, the list was not created.\nHow may I help you today?")
-            # TODO return markup k/b with buttons for each of the /commands
+            list_management(call.message)
 
         # view tasks within the selected list
         elif call.data.find('cb_vtask_') != -1:
             selected_list_id = call.data[len('cb_vtask_'):]
             bot.answer_callback_query(call.id, "Here are your tasks ᕙ(⇀‸↼‶)ᕗ")
             show_tasks(call.message, selected_list_id)
+            display_task_management(call.message)
 
         # add a task to the selected list
         elif call.data.find('cb_atask_') != -1:
@@ -185,7 +190,7 @@ def callback_query(call):
             remove_reply_keyboard(bot, call)
             bot.send_message(
                 call.message.chat.id, "Okay, the task was not deleted from the selected list.\nHow may I help you today?", reply_markup=telebot.types.ReplyKeyboardRemove())
-            # TODO return markup k/b with buttons for each of the /commands
+            display_task_management(call.message)
 
         # confirm create task
         elif call.data.find('cb_yatsk_') != -1:
@@ -207,7 +212,23 @@ def callback_query(call):
             remove_reply_keyboard(bot, call)
             bot.send_message(
                 call.message.chat.id, "Okay, the task was not created.\nHow may I help you today?")
-            # TODO return markup k/b with buttons for each of the /commands
+            display_task_management(call.message)
+
+        elif call.data.find('cb_seeAvailCmds') != -1:
+            bot.answer_callback_query(call.id, "Show available commands!")
+            about(call.message)
+
+        elif call.data.find('cb_getProfile') != -1:
+            bot.answer_callback_query(call.id, "Who am I?!?")
+            get_profile(call.message)
+
+        elif call.data.find('cb_listManagement') != -1:
+            bot.answer_callback_query(call.id, "List Management!")
+            list_management(call.message)
+
+        elif call.data.find('cb_disconnectZv') != -1:
+            bot.answer_callback_query(call.id, "I'm sad to see you go...")
+            logout(call.message)
 
         else:
             bot.answer_callback_query(
@@ -343,9 +364,16 @@ def start(msg):
 @bot.message_handler(commands=['about'])
 def about(msg):
     log_command_info('/about', msg)
+    output_string = ''
+    if is_authenticated(msg.chat.id):
+        for k, v in KNOWN_COMMANDS.items():
+            output_string += '• {} :{}\n'.format(k, v)
+    else:
+        for k, v in NO_AUTH_KNOWN_COMMANDS.items():
+            output_string += '• {} :{}\n'.format(k, v)
+
     bot.send_message(msg.chat.id,
-                     "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!~\n\nI understand the follow commands:\n{}\n\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(
-                         VERSION, KNOWN_COMMANDS if is_authenticated(msg.chat.id) else NO_AUTH_KNOWN_COMMANDS))
+                     "HepiR - v{}\nLately, I've been, I've been thinking\nI want you to be happier, I want you to use Zevere!~\n\nI understand the follow commands:\n{}\n...and I echo all regular messages you send to me so you will never be lonely ;).".format(VERSION, output_string), parse_mode="Markdown")
     return
 
 

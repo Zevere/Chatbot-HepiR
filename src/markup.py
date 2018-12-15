@@ -5,6 +5,21 @@ def hide_inline_keyboard_markup():
     return None
 
 
+def next_action_markup():
+    markup = InlineKeyboardMarkup(1)
+    markup.add(
+        InlineKeyboardButton("See available commands",
+                             callback_data="cb_seeAvailCmds"),
+        InlineKeyboardButton("Get Profile Information",
+                             callback_data="cb_getProfile"),
+        InlineKeyboardButton("List Management",
+                             callback_data="cb_listManagement"),
+        InlineKeyboardButton("Disconnect from Zevere",
+                             callback_data="cb_disconnectZv"),
+    )
+    return markup
+
+
 def list_management_markup():
     markup = InlineKeyboardMarkup()
     markup.row_width = 1

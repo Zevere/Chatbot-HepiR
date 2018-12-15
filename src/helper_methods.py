@@ -6,6 +6,7 @@ from pprint import pprint
 
 from authentication import (
     is_authenticated,
+    get_authenticated_zvuser,
 )
 
 from list_management import (
@@ -22,7 +23,28 @@ from task_management import(
 )
 
 
+def solicit_next_action(msg):
+    bot.send_message(
+        msg.chat.id, 'How many I further service you today?', reply_markup=next_action_markup())
+    pass
+
+
+def display_task_management(msg):
+    connected_user = get_authenticated_zvuser(msg.chat.id)
+    selected_list_id = user_collection.find_one(
+        {'zv_user': str(connected_user)}).get('selected_list_id')
+    selected_list = get_list_by_id(connected_user, selected_list_id)
+
+    bot.send_message(msg.chat.id,
+                     "{}\n*Task Management*\n{}\nWelcome to the Task Management Screen!\n\nYou have selected the list with the title of `{}`\n\nHere you will be able to view all of the tasks associated with this list, add new tasks to this list, delete tasks from this list.\n\nWhat would you like to do on this blessed day ☜(⌒▽⌒)☞?".format(
+                         '-'*23, '-'*23, selected_list['title']),
+                     parse_mode="Markdown",
+                     reply_markup=task_management_markup(selected_list_id))
+
+
 # get tg_id from msg
+
+
 def enforce_authentication(msg):
     print('Inside enforce_authentication')
     # check if authenticated
@@ -84,10 +106,13 @@ def handle_create_list_description_force_reply(msg, list_title):
                          ),
                          parse_mode="Markdown"
                          )
+        solicit_next_action(msg)
+
     else:
         bot.send_message(msg.chat.id,
                          'An error has occured and the list was not created.',
                          parse_mode="Markdown",)
+        solicit_next_action(msg)
 
     return
 
@@ -115,10 +140,13 @@ def handle_create_task_description_force_reply(msg, task_title):
                          ),
                          parse_mode="Markdown"
                          )
+        display_task_management(msg)
+
     else:
         bot.send_message(msg.chat.id,
                          'An error has occured and the task was not created.',
                          parse_mode="Markdown",)
+        display_task_management(msg)
 
     return
 
@@ -158,6 +186,7 @@ def handle_create_list_id_force_reply(msg):
                              abs(leftover_char_limit)),
                          parse_mode="Markdown"
                          )
+
     return
 
 
@@ -182,6 +211,7 @@ def handle_create_task_id_force_reply(msg, zv_user, list_id):
                     task_title),
                     parse_mode="Markdown"
                 )
+                display_task_management(msg)
                 return
 
         bot.send_message(msg.chat.id,
@@ -196,6 +226,7 @@ def handle_create_task_id_force_reply(msg, zv_user, list_id):
                              abs(leftover_char_limit)),
                          parse_mode="Markdown"
                          )
+        display_task_management(msg)
     return
 
 
@@ -209,10 +240,13 @@ def delete_list_confirm_btn_clicked(msg, list_id):
                          'The list with the id `{}` was successfully deleted.'.format(
                              delete_list_results[1]),
                          parse_mode="Markdown",)
+        solicit_next_action(msg)
+
     else:
         bot.send_message(msg.chat.id,
                          'An error has occured and the list was not deleted.',
                          parse_mode="Markdown",)
+        solicit_next_action(msg)
 
 
 def delete_task_confirm_btn_clicked(msg, task_id):
@@ -230,10 +264,13 @@ def delete_task_confirm_btn_clicked(msg, task_id):
                          'The task with the id `{}` was successfully deleted.'.format(
                              delete_task_results[1]),
                          parse_mode="Markdown",)
+        display_task_management(msg)
+
     else:
         bot.send_message(msg.chat.id,
                          'An error has occured and the task was not deleted.',
                          parse_mode="Markdown",)
+        display_task_management(msg)
     return
 
 

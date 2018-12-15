@@ -3,11 +3,18 @@ import telebot
 from flask import Flask
 from pymongo import MongoClient
 
-VERSION = "3.12.0"
-KNOWN_COMMANDS = ('/start', '/about', '/login', '/me',
-                  '/lists', '/logout')
+VERSION = "3.12.1"
 
-NO_AUTH_KNOWN_COMMANDS = ('/start', '/about', '/login')
+KNOWN_COMMANDS = {
+    '/about': 'Learn more about HepiR and see available commands',
+    '/login': 'Connect your telegram account to an existing Zevere account',
+    '/me': 'Get Profile information about the connected Zevere user account',
+    '/lists': 'Manage your task lists through the List Management screen',
+    '/logout': 'Disconnect your telegram account from the connected Zevere account'
+}
+
+NO_AUTH_KNOWN_COMMANDS = {k: KNOWN_COMMANDS[k]
+                          for k in KNOWN_COMMANDS.keys() & {'/about', '/login'}}
 
 LOCAL_ENV = False
 
