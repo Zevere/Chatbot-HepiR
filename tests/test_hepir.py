@@ -1,11 +1,38 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+"""This module will be executed by the pytest testing framework in
+order to validate the functionalities of the core functionalities
+of our HepiR end-user facing chat bot interface for the telegram
+platform.
+
+These tests will be executed as part of the Travis CI workflow to
+ensure the continued success of the functionalities of the HepiR
+app.
+
+See https://docs.pytest.org/en/latest/ for more details on how the
+testing framework works.
+"""
+
+# import properties required for the execution of the testing of hepir's core functionalities
 from test_properties import *
+
+# import the authentication functionalities from the authentication module
 from authentication import connect, disconnect, get_authenticated_zvuser, is_authenticated
+
+# import the list management functionalities from the list_management module
 from list_management import create_list, get_all_lists, delete_list, get_list_by_id
+
+# import the task management functionalities from the task_management module
 from task_management import get_all_tasks, create_task, delete_task
 
 
 class TestAuthentication(object):
+    """This class is used to test the authentication core functions of HepiR.
+    """
+
     def test_login(self):
+        """This method tests the functionality of the login method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged out first before trying to login with the account
         print('*'*50)
@@ -22,6 +49,8 @@ class TestAuthentication(object):
             False, 'You have provided invalid login credentials.')
 
     def test_is_authenticated(self):
+        """This method tests the functionality of the is_authenticated method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first before trying to logout with the account
         connect(*VALID_ZV_CONNECTION)
@@ -35,6 +64,8 @@ class TestAuthentication(object):
         assert is_authenticated(INVALID_TG_ID) == False
 
     def test_get_authenticated_zvuser(self):
+        """This method tests the functionality of the get_authenticated_zvuser method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first
         print('*'*50)
@@ -49,6 +80,8 @@ class TestAuthentication(object):
         assert get_authenticated_zvuser(INVALID_TG_ID) is None
 
     def test_logout(self):
+        """This method tests the functionality of the disconnect method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first before trying to logout with the account
         print('*'*50)
@@ -66,7 +99,12 @@ class TestAuthentication(object):
 
 
 class TestListManagmement(object):
+    """This class is used to test the list management core functions of HepiR.
+    """
+
     def test_create_list(self):
+        """This method tests the functionality of the create_list method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first
         print('*'*50)
@@ -86,6 +124,8 @@ class TestListManagmement(object):
                            LIST_TITLE, LIST_DESCRIPTION) == (False, None)
 
     def test_get_all_lists(self):
+        """This method tests the functionality of the get_all_lists method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first
         print('*'*50)
@@ -100,6 +140,8 @@ class TestListManagmement(object):
         assert get_all_lists(INVALID_ZEVERE_USER) is None
 
     def test_get_list_by_id(self):
+        """This method tests the functionality of the get_list_by_id method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first
         print('*'*50)
@@ -115,6 +157,8 @@ class TestListManagmement(object):
         assert get_list_by_id(VALID_ZEVERE_USER, INVALID_LIST_ID) is None
 
     def test_delete_list(self):
+        """This method tests the functionality of the delete_list method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first
         print('*'*50)
@@ -140,7 +184,12 @@ class TestListManagmement(object):
 
 
 class TestTaskManagement(object):
+    """This class is used to test the task management core functions of HepiR.
+    """
+
     def test_create_task(self):
+        """This method tests the functionality of the create_task method.
+        """
         # TEST ENV SETUP
         # make sure the valid account is logged in first before trying to logout with the account
         print('*'*50)
@@ -177,6 +226,8 @@ class TestTaskManagement(object):
                            LIST_TITLE, LIST_DESCRIPTION) == (False, None)
 
     def test_get_all_tasks(self):
+        """This method tests the functionality of the get_all_tasks method.
+        """
         # returns list of tasks for existant zevere user and his/her owned list
         assert type(get_all_tasks(VALID_ZEVERE_USER, VALID_LIST_ID)) == list
 
@@ -187,6 +238,8 @@ class TestTaskManagement(object):
         assert get_all_tasks(INVALID_ZEVERE_USER, VALID_LIST_ID) is None
 
     def test_delete_task(self):
+        """This method tests the functionality of the delete_task method.
+        """
         # trying to delete a task not part of the list passed
         # in as an argument should return False and None as no
         # task was deleted
@@ -207,5 +260,5 @@ class TestTaskManagement(object):
         print('TEST ENVIRONMENT CLEANUP')
         print('The list with id = {} was successfully deleted'.format(
             delete_list(*VALID_LIST_AND_OWNER)[1]))
-        # print(disconnect(*VALID_ZV_CONNECTION)[1])
+        print(disconnect(*VALID_ZV_CONNECTION)[1])
         print('*'*50)
