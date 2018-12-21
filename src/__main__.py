@@ -333,7 +333,7 @@ def login(msg):
 
         # query vivid to get zevere profile associated with connected zv_user
         #     e.g. GET VIVID_ROOT_URL/api/v1/operations/getUserProfile/?username=kevin.ma
-        vivid_request = requests.get(
+        requests.get(
             '{}/api/v1/operations/getUserProfile/'.format(VIVID_ROOT_URL), params={'username': zv_user},
             auth=(VIVID_USER, VIVID_PASSWORD))
 
