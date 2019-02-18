@@ -1,0 +1,24 @@
+{
+  "projectName": "Chatbot-HepiR",
+  "projectOwner": "Zevere",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "kbmakevin",
+      "name": "Kevin Ma",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14854884?v=4",
+      "profile": "https://github.com/kbmakevin",
+      "contributions": [
+        "test",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}
